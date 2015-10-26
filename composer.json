@@ -1,7 +1,13 @@
 {
     "name": "onebip/onebip-concurrency",
     "license": "MIT",
-    "require": {},
+    "require": {
+        "onebip/onebip-clock": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "@stable",
+        "phake/phake": "~2.1"
+    },
     "autoload": {
         "psr-0": {
             "Onebip\\": "src/"

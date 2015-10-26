@@ -51,20 +51,45 @@ class MongoLock implements Lock
             ]);
         } catch (MongoCursorException $e) {
             if ($e->getCode() == self::DUPLICATE_KEY) {
-                throw new LockNotAvailableException("{$this->processName} cannot acquire a lock for the program {$this->programName}");
+                throw new LockNotAvailableException(
+                    "{$this->processName} cannot acquire a lock for the program {$this->programName}"
+                );
             }
             throw $e;
         }
-    } 
+    }
+
+    public function refresh($duration = 3600)
+    {
+        $now = $this->clock->current();
+
+        $this->removeExpiredLocks($now);
+
+        $expiration = clone $now;
+        $expiration->add(new DateInterval("PT{$duration}S"));
+
+        $result = $this->collection->update(
+            ['program' => $this->programName, 'process' => $this->processName],
+            ['$set' => ['expires_at' => new MongoDate($expiration->getTimestamp())]]
+        );
+
+        if (!$this->lockRefreshed($result)) {
+            throw new LockNotAvailableException(
+                "{$this->processName} cannot acquire a lock for the program {$this->programName}"
+            );
+        }
+    }
 
     public function show()
     {
         $document = $this->collection->findOne(
             ['program' => $this->programName]
         );
-        $this->convertToIso8601String($document['acquired_at']);
-        $this->convertToIso8601String($document['expires_at']);
-        unset($document['_id']);
+        if (!is_null($document)) {
+            $this->convertToIso8601String($document['acquired_at']);
+            $this->convertToIso8601String($document['expires_at']);
+            unset($document['_id']);
+        }
         return $document;
     }
 
@@ -77,7 +102,9 @@ class MongoLock implements Lock
         $operationResult = $this->collection->remove($query);
         $affectedDocuments = $operationResult['n'];
         if ($affectedDocuments != 1) {
-            throw new LockNotAvailableException("{$this->processName} does not have a lock for {$this->programName} to release");
+            throw new LockNotAvailableException(
+                "{$this->processName} does not have a lock for {$this->programName} to release"
+            );
         }
     }
 
@@ -99,7 +126,9 @@ class MongoLock implements Lock
             $i++;
             if ($result) {
                 if ($now > $timeLimit) {
-                    throw new LockNotAvailableException("I have been waiting up until {$timeLimit->format(DateTime::ISO8601)} for the lock $this->programName ($maximumWaitingTime seconds), but it is still not available.");
+                    throw new LockNotAvailableException(
+                        "I have been waiting up until {$timeLimit->format(DateTime::ISO8601)} for the lock $this->programName ($maximumWaitingTime seconds), but it is still not available."
+                    );
                 }
                 call_user_func($this->sleep, $polling);
             } else {
@@ -124,5 +153,16 @@ class MongoLock implements Lock
         $datetime->setTimestamp($field->sec);
         $datetime->setTimezone(new DateTimeZone('UTC'));
         $field = $datetime->format(DateTime::ISO8601);
+    }
+
+    private function lockRefreshed($result)
+    {
+        if (isset($result['n'])) {
+            return $result['n'] === 1;
+        }
+        // result is not known (write concern is not set) so we check to see if
+        // a lock document exists, if lock document exists we are pretty sure
+        // that its update succeded
+        return !is_null($this->show());
     }
 }

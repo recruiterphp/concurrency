@@ -31,7 +31,7 @@ class Poison
             $this->sleepUntilThereIsSomethingInteresting($timeLimit, $child);
             if ($this->isAlive($child)) {
                 $this->kill($child);
-                throw new TimeoutException("{$this->programName} ($pid) killed after he reached time limit of {$timeLimit}!");
+                throw new TimeoutException("{$this->programName} ($pid) killed after it reached time limit of {$timeLimit}!");
             }
             exit;
         } else {

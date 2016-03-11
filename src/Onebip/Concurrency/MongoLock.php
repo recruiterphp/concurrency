@@ -114,20 +114,18 @@ class MongoLock implements Lock
      */
     public function wait($polling = 30, $maximumWaitingTime = 3600)
     {
-        $i = 0;
         $timeLimit = $this->clock->current()->add(new DateInterval("PT{$maximumWaitingTime}S"));
         while (true) {
             $now = $this->clock->current();
             $result = $this->collection->count($query = [
                 'program' => $this->programName,
-                'expires_at' => ['$gt' => new MongoDate($now->getTimestamp())],
+                'expires_at' => ['$gte' => new MongoDate($now->getTimestamp())],
             ]);
 
-            $i++;
             if ($result) {
                 if ($now > $timeLimit) {
                     throw new LockNotAvailableException(
-                        "I have been waiting up until {$timeLimit->format(DateTime::ISO8601)} for the lock $this->programName ($maximumWaitingTime seconds), but it is still not available."
+                        "I have been waiting up until {$timeLimit->format(DateTime::ISO8601)} for the lock $this->programName ($maximumWaitingTime seconds polling every $polling seconds), but it is still not available (now is {$now->format(DateTime::ISO8601)})."
                     );
                 }
                 call_user_func($this->sleep, $polling);

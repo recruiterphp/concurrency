@@ -152,11 +152,28 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
             $this->fail("Should fail after 60 seconds");
         } catch (LockNotAvailableException $e) {
             $this->assertEquals(
-                "I have been waiting up until 2014-01-01T00:01:00+0100 for the lock windows_defrag (60 seconds), but it is still not available.",
+                "I have been waiting up until 2014-01-01T00:01:00+0100 for the lock windows_defrag (60 seconds polling every 30 seconds), but it is still not available (now is 2014-01-01T00:01:00+0000).",
                 $e->getMessage()
             );
         }
+    }
 
+    public function testALockWaitedUponCanBeImmediatelyReacquired()
+    {
+        $allCalls = Phake::when($this->clock)->current()
+            ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
+            ->thenReturn(new DateTime('2014-01-01T00:00:30Z'))
+            ->thenReturn(new DateTime('2014-01-01T00:00:30Z'))
+            ->thenReturn(new DateTime('2014-01-01T00:00:30Z'))
+            ->thenReturn(new DateTime('2014-01-01T00:00:31Z'))
+            ->thenReturn(new DateTime('2014-01-01T00:00:31Z'))
+            ;
+        $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
+        $first->acquire(30);
+
+        $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock, $this->sleep);
+        $second->wait($polling = 1);
+        $second->acquire();
     }
 
     public function testAnAlreadyAcquiredLockCanBeRefreshed()

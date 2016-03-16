@@ -6,7 +6,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "@stable",
-        "phake/phake": "~2.1"
+        "phake/phake": "~2.1",
+        "giorgiosironi/eris": "dev-master"
     },
     "autoload": {
         "psr-0": {

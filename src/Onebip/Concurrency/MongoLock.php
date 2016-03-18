@@ -121,6 +121,7 @@ class MongoLock implements Lock
                 'program' => $this->programName,
                 'expires_at' => ['$gte' => new MongoDate($now->getTimestamp())],
             ]);
+            echo "Waiting", PHP_EOL;
 
             if ($result) {
                 if ($now > $timeLimit) {

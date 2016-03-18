@@ -240,6 +240,14 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
                     )
                 )
             )
+            ->when(function($sequencesOfSteps) {
+                foreach ($sequencesOfSteps as $sequence) {
+                    if (!$sequence) {
+                        return false;
+                    }
+                }
+                return true;
+            })
             ->then(function($sequencesOfSteps) {
                 $this->lockCollection->drop();
                 $log = "/tmp/mongolock_{$this->iteration}.log";
@@ -257,8 +265,23 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
                 }
                 foreach ($processes as $process) {
                     $process->wait();
+                    $this->assertExitedCorrectly($process, "Error in MongoLock run");
                 }
+                $process = new Process("exec java -jar " . __DIR__ . "/knossos-onebip.jar mongo-lock $log");
+                $process->run();
+                $this->assertExitedCorrectly($process, "Non-linearizable history in $log");
                 $this->iteration++;
             });
+    }
+
+    private function assertExitedCorrectly($process, $errorMessage)
+    {
+        $this->assertEquals(
+            0,
+            $process->getExitCode(),
+            $errorMessage . PHP_EOL .
+            $process->getErrorOutput() . PHP_EOL .
+            $process->getOutput()
+        );
     }
 }

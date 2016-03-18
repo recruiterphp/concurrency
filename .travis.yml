@@ -8,4 +8,5 @@ script:
   - "vendor/bin/phpunit --exclude-group long spec"
   - "vendor/bin/phpunit --group long spec"
 sudo: false
+services: mongodb
 

@@ -1,11 +1,17 @@
 <?php
 namespace Onebip\Concurrency;
+
 use DateTime;
 use Phake;
 use MongoClient;
+use Eris;
+use Eris\Generator;
+use Symfony\Component\Process\Process;
 
 class MongoLockTest extends \PHPUnit_Framework_TestCase
 {
+    use Eris\TestTrait;
+
     public function setUp()
     {
         $this->lockCollection = (new MongoClient())->test->lock;
@@ -219,5 +225,40 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
     private function givenTimeIsFixed()
     {
         Phake::when($this->clock)->current()->thenReturn(new DateTime('2014-01-01'));
+    }
+
+    public function testPropertyBased()
+    {
+        $this->iteration = 0;
+        $this
+            ->forAll(
+                Generator\vector(
+                    2,
+                    Generator\seq(
+                        Generator\elements(['acquire', 'release'])
+                        // TODO: add 'sleep'
+                    )
+                )
+            )
+            ->then(function($sequencesOfSteps) {
+                $this->lockCollection->drop();
+                $log = "/tmp/mongolock_{$this->iteration}.log";
+                if (file_exists($log)) {
+                    unlink($log);
+                }
+                
+                $processes = [];
+                foreach ($sequencesOfSteps as $i => $sequence) {
+                    $processName = "p{$i}";
+                    $steps = implode(',', $sequence);
+                    $process = new Process("exec php " . __DIR__ . "/mongolock.php $processName $steps >> $log");
+                    $process->start();
+                    $processes[] = $process;
+                }
+                foreach ($processes as $process) {
+                    $process->wait();
+                }
+                $this->iteration++;
+            });
     }
 }

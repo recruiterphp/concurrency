@@ -1,12 +1,10 @@
 <?php
 namespace Onebip\Concurrency;
 
-use DateInterval;
-use DateTime;
 use Eris;
 use Eris\Generator;
 use Eris\Listener;
-use Onebip\Clock;
+use Onebip\Clock\SettableClock;
 
 class PeriodicalCheckTest extends \PHPUnit_Framework_TestCase
 {
@@ -44,22 +42,3 @@ class PeriodicalCheckTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class SettableClock implements Clock
-{
-    private $current;
-    
-    public function __construct(DateTime $current)
-    {
-        $this->current = $current;
-    }
-
-    public function advance($seconds)
-    {
-        $this->current->add(new DateInterval("PT{$seconds}S"));
-    }
-
-    public function current()
-    {
-        return $this->current;
-    }
-}

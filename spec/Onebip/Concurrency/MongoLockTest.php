@@ -52,8 +52,8 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
     public function testAnAlreadyAcquiredLockCanExpireSoThatItCanBeAcquiredAgain()
     {
         Phake::when($this->clock)->current()
-            ->thenReturn(new DateTime('2014-01-01T10:00:00'))
-            ->thenReturn(new DateTime('2014-01-01T11:00:01'))
+            ->thenReturn(new DateTime('2014-01-01T10:00:00Z'))
+            ->thenReturn(new DateTime('2014-01-01T11:00:01Z'))
         ;
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire(3600);
@@ -130,9 +130,9 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
     {
         $allCalls = Phake::when($this->clock)->current()
             ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:00'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:00'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:30'))
+            ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
+            ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
+            ->thenReturn(new DateTime('2014-01-01T00:00:30Z'))
             ->thenReturn(new DateTime('2014-01-01T00:01:00Z'));
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire(45);
@@ -146,9 +146,11 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
     {
         $allCalls = Phake::when($this->clock)->current()
             ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:00'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:30'))
-            ->thenReturn(new DateTime('2014-01-01T00:01:00Z'));
+            ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
+            ->thenReturn(new DateTime('2014-01-01T00:00:30Z'))
+            ->thenReturn(new DateTime('2014-01-01T00:00:50Z'))
+            ->thenReturn(new DateTime('2014-01-01T00:01:01Z'))
+            ->thenThrow(new \LogicException("Should not call anymore"));
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire(3600);
 
@@ -158,7 +160,7 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
             $this->fail("Should fail after 60 seconds");
         } catch (LockNotAvailableException $e) {
             $this->assertEquals(
-                "I have been waiting up until 2014-01-01T00:01:00+0100 for the lock windows_defrag (60 seconds polling every 30 seconds), but it is still not available (now is 2014-01-01T00:01:00+0000).",
+                "I have been waiting up until 2014-01-01T00:01:00+0000 for the lock windows_defrag (60 seconds polling every 30 seconds), but it is still not available (now is 2014-01-01T00:01:01+0000).",
                 $e->getMessage()
             );
         }
@@ -227,6 +229,9 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
         Phake::when($this->clock)->current()->thenReturn(new DateTime('2014-01-01'));
     }
 
+    /**
+     * @group long
+     */
     public function testPropertyBased()
     {
         $this->iteration = 0;

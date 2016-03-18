@@ -1,9 +1,10 @@
 (ns knossos-onebip.core
   (:gen-class)
   (:require [knossos.core :as core]
-            [knossos-onebip.model :as model]
             [clojure.java.io :as io]
-            [clojure-csv.core :refer [parse-csv]]))
+            [knossos-onebip.model]
+            [clojure-csv.core :refer [parse-csv]]
+            [clojure.pprint :refer [pprint]]))
 
 (defn history-from-file [path]
   (let [lines (-> (io/file path)
@@ -25,6 +26,11 @@
   "Pass a model name (e.g. 'mongo-lock' and a CSV file.
   with the structure 'timestamp,process,type,f' (e.g. '1458232058222295,pp0,invoke|ok|fail,acquire')"
   [& args]
-  (let [[model-name filename] args]
-    (check-history (ns-resolve (find-ns 'knossos-onebip.model) (symbol model-name))
-                    filename)))
+  (let [[model-name filename] args
+        model-fn (ns-resolve (find-ns 'knossos-onebip.model)
+                             (symbol model-name))
+        analysis (check-history model-fn filename)]
+    (pprint analysis)
+    (if (:valid? analysis)
+      (System/exit 0)
+      (System/exit 1))))

@@ -75,7 +75,7 @@ class MongoLock implements Lock
 
         if (!$this->lockRefreshed($result)) {
             throw new LockNotAvailableException(
-                "{$this->processName} cannot acquire a lock for the program {$this->programName}"
+                "{$this->processName} cannot acquire a lock for the program {$this->programName}, result is: " . var_export($result, true)
             );
         }
     }

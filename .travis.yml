@@ -1,7 +1,7 @@
 language: php
 php:
   - 7.1
-before_script: 
+before_script:
   - "phpenv config-add phpconfig.ini"
   - "composer install"
 script:
@@ -9,4 +9,3 @@ script:
   - "vendor/bin/phpunit --group long spec"
 sudo: false
 services: mongodb
-

@@ -1,10 +1,11 @@
 <?php
 namespace Onebip\Concurrency;
 
-use InvalidArgumentException;
 use Exception;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
 
-class InProcessRetryTest extends \PHPUnit_Framework_TestCase
+class InProcessRetryTest extends TestCase
 {
     public function setUp()
     {
@@ -34,7 +35,7 @@ class InProcessRetryTest extends \PHPUnit_Framework_TestCase
             return $this->count;
         };
     }
-    
+
     public function testPerformsOnceATaskIfItIsSuccessful()
     {
         $retry = InProcessRetry::of($this->counter, 'InvalidArgumentException');

@@ -5,8 +5,9 @@ use Eris;
 use Eris\Generator;
 use Eris\Listener;
 use Onebip\Clock\SettableClock;
+use PHPUnit\Framework\TestCase;
 
-class PeriodicalCheckTest extends \PHPUnit_Framework_TestCase
+class PeriodicalCheckTest extends TestCase
 {
     use Eris\TestTrait;
 
@@ -30,7 +31,7 @@ class PeriodicalCheckTest extends \PHPUnit_Framework_TestCase
                 });
                 $check->__invoke();
                 foreach ($deltas as $delta) {
-                    $clock->advance($delta);  
+                    $clock->advance($delta);
                     $check->__invoke();
                 }
                 $totalInterval = array_sum($deltas);
@@ -41,4 +42,3 @@ class PeriodicalCheckTest extends \PHPUnit_Framework_TestCase
             });
     }
 }
-

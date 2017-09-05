@@ -43,12 +43,13 @@ class MongoLock implements Lock
         $expiration->add(new DateInterval("PT{$duration}S"));
 
         try {
-            $this->collection->insert([
+            $document = [
                 'program' => $this->programName,
                 'process' => $this->processName,
                 'acquired_at' => new MongoDate($now->getTimestamp()),
                 'expires_at' => new MongoDate($expiration->getTimestamp()),
-            ]);
+            ];
+            $this->collection->insert($document);
         } catch (MongoCursorException $e) {
             if ($e->getCode() == self::DUPLICATE_KEY) {
                 throw new LockNotAvailableException(

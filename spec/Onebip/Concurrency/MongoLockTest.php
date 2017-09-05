@@ -7,8 +7,9 @@ use MongoClient;
 use Eris;
 use Eris\Generator;
 use Symfony\Component\Process\Process;
+use PHPUnit\Framework\TestCase;
 
-class MongoLockTest extends \PHPUnit_Framework_TestCase
+class MongoLockTest extends TestCase
 {
     use Eris\TestTrait;
 
@@ -33,6 +34,7 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
         $this->givenTimeIsFixed();
         $lock = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $lock->acquire();
+        $this->assertTrue(true, 'make PHPUnit happy');
     }
 
     /**
@@ -47,6 +49,7 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
         $second->acquire();
+        // $this->assertTrue(true, 'make PHPUnit happy');
     }
 
     public function testAnAlreadyAcquiredLockCanExpireSoThatItCanBeAcquiredAgain()
@@ -60,6 +63,7 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
         $second->acquire(3600);
+        $this->assertTrue(true, 'make PHPUnit happy');
     }
 
     public function testLockForDifferentProgramsDoNotInterfereWithEachOther()
@@ -70,6 +74,7 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
 
         $second = new MongoLock($this->lockCollection, 'sll_world_domination', 'ws-a-30:23', $this->clock);
         $second->acquire();
+        $this->assertTrue(true, 'make PHPUnit happy');
     }
 
     public function testLocksCanBeReleasedToMakeThemAvailableAgain()
@@ -81,6 +86,7 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
         $second->acquire();
+        $this->assertTrue(true, 'make PHPUnit happy');
     }
 
     /**
@@ -105,6 +111,7 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
         $second->release($force = true);
+        $this->assertTrue(true, 'make PHPUnit happy');
     }
 
     public function testALockCanBeShownEvenByOtherProcessesWorkingOnTheSameProgram()
@@ -124,6 +131,7 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
             ],
             $second->show()
         );
+        $this->assertTrue(true, 'make PHPUnit happy');
     }
 
     public function testALockCanBeWaitedOnUntilItsDisappearance()
@@ -182,6 +190,7 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock, $this->sleep);
         $second->wait($polling = 1);
         $second->acquire();
+        $this->assertTrue(true, 'make PHPUnit happy');
     }
 
     public function testAnAlreadyAcquiredLockCanBeRefreshed()
@@ -259,7 +268,7 @@ class MongoLockTest extends \PHPUnit_Framework_TestCase
                 if (file_exists($log)) {
                     unlink($log);
                 }
-                
+
                 $processes = [];
                 foreach ($sequencesOfSteps as $i => $sequence) {
                     $processName = "p{$i}";

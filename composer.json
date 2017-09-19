@@ -2,7 +2,7 @@
     "name": "onebip/onebip-concurrency",
     "license": "MIT",
     "require": {
-        "php": ">=7.1.0",
+        "php": ">=5.6.0",
         "onebip/onebip-clock": "dev-php-7"
     },
     "require-dev": {

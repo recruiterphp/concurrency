@@ -3,7 +3,7 @@
     "license": "MIT",
     "require": {
         "php": ">=5.6.0",
-        "onebip/onebip-clock": "dev-php-7"
+        "onebip/onebip-clock": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "@stable",

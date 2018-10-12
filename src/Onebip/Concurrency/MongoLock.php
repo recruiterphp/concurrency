@@ -28,12 +28,12 @@ class MongoLock implements Lock
         $this->sleep = $sleep;
     }
 
-    public static function forProgram($programName, MongoCollection $collection)
+    public static function forProgram($programName, MongoCollection $collection): self
     {
         return new self($collection, $programName, gethostname() . ':' . getmypid());
     }
 
-    public function acquire($duration = 3600)
+    public function acquire($duration = 3600): void
     {
         $now = $this->clock->current();
 
@@ -60,7 +60,7 @@ class MongoLock implements Lock
         }
     }
 
-    public function refresh($duration = 3600)
+    public function refresh($duration = 3600): void
     {
         $now = $this->clock->current();
 
@@ -81,7 +81,7 @@ class MongoLock implements Lock
         }
     }
 
-    public function show()
+    public function show(): ?array
     {
         $document = $this->collection->findOne(
             ['program' => $this->programName]
@@ -94,7 +94,7 @@ class MongoLock implements Lock
         return $document;
     }
 
-    public function release($force = false)
+    public function release($force = false): void
     {
         $query = ['program' => $this->programName];
         if (!$force) {
@@ -113,7 +113,7 @@ class MongoLock implements Lock
      * @param integer $polling  how frequently to check the lock presence
      * @param integer $maximumWaitingTime  a limit to the waiting
      */
-    public function wait($polling = 30, $maximumWaitingTime = 3600)
+    public function wait($polling = 30, $maximumWaitingTime = 3600): void
     {
         $timeLimit = $this->clock->current()->add(new DateInterval("PT{$maximumWaitingTime}S"));
         while (true) {
@@ -136,7 +136,7 @@ class MongoLock implements Lock
         }
     }
 
-    private function removeExpiredLocks(DateTime $now)
+    private function removeExpiredLocks(DateTime $now): void
     {
         $this->collection->remove($query = [
             'program' => $this->programName,
@@ -146,7 +146,7 @@ class MongoLock implements Lock
         ]);
     }
 
-    private function convertToIso8601String(&$field)
+    private function convertToIso8601String(&$field): void
     {
         $datetime = new DateTime();
         $datetime->setTimestamp($field->sec);
@@ -154,7 +154,7 @@ class MongoLock implements Lock
         $field = $datetime->format(DateTime::ATOM);
     }
 
-    private function lockRefreshed($result)
+    private function lockRefreshed($result): bool
     {
         if (isset($result['n'])) {
             return $result['n'] === 1;

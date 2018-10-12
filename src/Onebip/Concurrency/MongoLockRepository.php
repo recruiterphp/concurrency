@@ -1,9 +1,11 @@
 <?php
+
 namespace Onebip\Concurrency;
+
 use MongoCollection;
 
 // TODO: converge MongoLockRepository and the HydraLockFactory
-class MongoLockRepository 
+class MongoLockRepository
 {
     private $collection;
 
@@ -22,12 +24,12 @@ class MongoLockRepository
                 'process' => $document['process'],
             ];
         }
+
         return $result;
     }
 
     /**
      * @private Use only in testing environments
-     * @return void
      */
     public function removeAll()
     {

@@ -1,15 +1,16 @@
 <?php
+
 namespace Onebip\Concurrency;
 
 class ProcessRequestedStatus
 {
     private $shouldTerminate;
     private $why;
-    
+
     public static function active()
     {
         return new self(false);
-    } 
+    }
 
     private function __construct($shouldTerminate, array $why = [])
     {
@@ -21,6 +22,7 @@ class ProcessRequestedStatus
     {
         $this->shouldTerminate = true;
         $this->why[] = $why;
+
         return $this;
     }
 

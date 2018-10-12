@@ -1,13 +1,14 @@
 <?php
+
 namespace Onebip\Concurrency;
 
 use DateTime;
-use Phake;
-use MongoClient;
 use Eris;
 use Eris\Generator;
-use Symfony\Component\Process\Process;
+use MongoClient;
+use Phake;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
 class MongoLockTest extends TestCase
 {
@@ -19,7 +20,7 @@ class MongoLockTest extends TestCase
         $this->clock = Phake::mock('Onebip\Clock');
 
         $this->slept = [];
-        $this->sleep = function($amount) {
+        $this->sleep = function ($amount) {
             $this->slept[] = $amount;
         };
     }
@@ -38,7 +39,7 @@ class MongoLockTest extends TestCase
     }
 
     /**
-     * @expectedException Onebip\Concurrency\LockNotAvailableException
+     * @expectedException \Onebip\Concurrency\LockNotAvailableException
      * @expectedExceptionMessage ws-a-30:23 cannot acquire a lock for the program windows_defrag
      */
     public function testAnAlreadyAcquiredLockCannotBeAcquiredAgain()
@@ -90,7 +91,7 @@ class MongoLockTest extends TestCase
     }
 
     /**
-     * @expectedException Onebip\Concurrency\LockNotAvailableException
+     * @expectedException \Onebip\Concurrency\LockNotAvailableException
      * @expectedExceptionMessage ws-a-30:23 does not have a lock for windows_defrag to release
      */
     public function testALockCannotBeReleasedBySomeoneElseThanTheProcessAcquiringIt()
@@ -158,17 +159,17 @@ class MongoLockTest extends TestCase
             ->thenReturn(new DateTime('2014-01-01T00:00:30Z'))
             ->thenReturn(new DateTime('2014-01-01T00:00:50Z'))
             ->thenReturn(new DateTime('2014-01-01T00:01:01Z'))
-            ->thenThrow(new \LogicException("Should not call anymore"));
+            ->thenThrow(new \LogicException('Should not call anymore'));
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire(3600);
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock, $this->sleep);
         try {
             $second->wait($polling = 30, $maximumInterval = 60);
-            $this->fail("Should fail after 60 seconds");
+            $this->fail('Should fail after 60 seconds');
         } catch (LockNotAvailableException $e) {
             $this->assertEquals(
-                "I have been waiting up until 2014-01-01T00:01:00+0000 for the lock windows_defrag (60 seconds polling every 30 seconds), but it is still not available (now is 2014-01-01T00:01:01+0000).",
+                'I have been waiting up until 2014-01-01T00:01:00+0000 for the lock windows_defrag (60 seconds polling every 30 seconds), but it is still not available (now is 2014-01-01T00:01:01+0000).',
                 $e->getMessage()
             );
         }
@@ -217,7 +218,7 @@ class MongoLockTest extends TestCase
     }
 
     /**
-     * @expectedException Onebip\Concurrency\LockNotAvailableException
+     * @expectedException \Onebip\Concurrency\LockNotAvailableException
      * @expectedExceptionMessage ws-a-25:42 cannot acquire a lock for the program windows_defrag
      */
     public function testAnExpiredLockCannotBeRefreshed()
@@ -254,15 +255,16 @@ class MongoLockTest extends TestCase
                     )
                 )
             )
-            ->when(function($sequencesOfSteps) {
+            ->when(function ($sequencesOfSteps) {
                 foreach ($sequencesOfSteps as $sequence) {
                     if (!$sequence) {
                         return false;
                     }
                 }
+
                 return true;
             })
-            ->then(function($sequencesOfSteps) {
+            ->then(function ($sequencesOfSteps) {
                 $this->lockCollection->drop();
                 $log = "/tmp/mongolock_{$this->iteration}.log";
                 if (file_exists($log)) {
@@ -273,18 +275,18 @@ class MongoLockTest extends TestCase
                 foreach ($sequencesOfSteps as $i => $sequence) {
                     $processName = "p{$i}";
                     $steps = implode(',', $sequence);
-                    $process = new Process("exec php " . __DIR__ . "/mongolock.php $processName $steps >> $log");
+                    $process = new Process('exec php ' . __DIR__ . "/mongolock.php $processName $steps >> $log");
                     $process->start();
                     $processes[] = $process;
                 }
                 foreach ($processes as $process) {
                     $process->wait();
-                    $this->assertExitedCorrectly($process, "Error in MongoLock run");
+                    $this->assertExitedCorrectly($process, 'Error in MongoLock run');
                 }
-                $process = new Process("exec java -jar " . __DIR__ . "/knossos-onebip.jar mongo-lock $log");
+                $process = new Process('exec java -jar ' . __DIR__ . "/knossos-onebip.jar mongo-lock $log");
                 $process->run();
                 $this->assertExitedCorrectly($process, "Non-linearizable history in $log");
-                $this->iteration++;
+                ++$this->iteration;
             });
     }
 

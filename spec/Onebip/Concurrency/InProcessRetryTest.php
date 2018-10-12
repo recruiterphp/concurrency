@@ -1,4 +1,5 @@
 <?php
+
 namespace Onebip\Concurrency;
 
 use Exception;
@@ -10,28 +11,30 @@ class InProcessRetryTest extends TestCase
     public function setUp()
     {
         $this->count = 0;
-        $this->counter = function() {
-            $this->count++;
+        $this->counter = function () {
+            ++$this->count;
+
             return $this->count;
         };
     }
 
     private function exceptionalCounterFactory($exceptionClass)
     {
-        return function() use ($exceptionClass) {
-            $this->count++;
+        return function () use ($exceptionClass) {
+            ++$this->count;
             throw new $exceptionClass();
         };
     }
 
     private function limitedExceptionalCounterFactory($exceptionClass, $limit)
     {
-        return function() use ($exceptionClass, &$limit) {
-            $this->count++;
+        return function () use ($exceptionClass, &$limit) {
+            ++$this->count;
             if ($limit > 0) {
-                $limit--;
+                --$limit;
                 throw new $exceptionClass();
             }
+
             return $this->count;
         };
     }
@@ -54,7 +57,7 @@ class InProcessRetryTest extends TestCase
         $retry = InProcessRetry::of($this->exceptionalCounterFactory('InvalidArgumentException'), 'InvalidArgumentException');
         try {
             $retry->__invoke();
-            $this->fail("Should let the 2nd InvalidArgumentException bubble up");
+            $this->fail('Should let the 2nd InvalidArgumentException bubble up');
         } catch (InvalidArgumentException $e) {
         }
         $this->assertEquals(2, $this->count);
@@ -71,7 +74,7 @@ class InProcessRetryTest extends TestCase
         $retry = InProcessRetry::of($this->exceptionalCounterFactory('Exception'), 'InvalidArgumentException');
         try {
             $retry->__invoke();
-            $this->fail("Should let the 1st Exception bubble up");
+            $this->fail('Should let the 1st Exception bubble up');
         } catch (Exception $e) {
         }
         $this->assertEquals(1, $this->count);
@@ -92,7 +95,7 @@ class InProcessRetryTest extends TestCase
             ->forTimes($failures);
         try {
             $retry->__invoke();
-            $this->fail("Even multiple invocations should always fail.");
+            $this->fail('Even multiple invocations should always fail.');
         } catch (InvalidArgumentException $e) {
             $this->assertEquals($totalCalls = $failures + 1, $this->count);
         }

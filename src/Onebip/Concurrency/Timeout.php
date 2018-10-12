@@ -1,4 +1,5 @@
 <?php
+
 namespace Onebip\Concurrency;
 
 class Timeout
@@ -16,6 +17,7 @@ class Timeout
         if (!is_numeric($timeout)) {
             throw new \InvalidArgumentException("The timeout must be numeric, since it's expressed in seconds. Instead it is `$timeout`.");
         }
+
         return new self($timeout * 1000 * 1000, $waitingFor);
     }
 
@@ -25,15 +27,17 @@ class Timeout
     {
         $this->maximum = $microseconds;
         $this->waitingFor = $waitingFor;
-        $this->afterCheck = function() {};
+        $this->afterCheck = function () {
+        };
     }
 
     public function checkEvery($microseconds, $afterCheck = null)
     {
         $this->pollingInterval = $microseconds;
-        if ($this->afterCheck !== null) {
+        if (null !== $this->afterCheck) {
             $this->afterCheck = $afterCheck;
         }
+
         return $this;
     }
 
@@ -51,13 +55,14 @@ class Timeout
     }
 
     /**
-     * @param callable $callback  should return true when the condition you are waiting for is met
+     * @param callable $callback should return true when the condition you are waiting for is met
+     *
      * @throws TimeoutException
      */
     public function until($callback, $microseconds = null)
     {
-        if ($microseconds === null) {
-            if ($this->pollingInterval !== null) {
+        if (null === $microseconds) {
+            if (null !== $this->pollingInterval) {
                 $microseconds = $this->pollingInterval;
             } else {
                 $microseconds = 200000;

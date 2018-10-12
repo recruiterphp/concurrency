@@ -138,6 +138,11 @@ class MongoLock implements Lock
         }
     }
 
+    public function __toString(): string
+    {
+        return var_export($this->show(), true);
+    }
+
     private function removeExpiredLocks(DateTime $now): void
     {
         $this->collection->remove($query = [

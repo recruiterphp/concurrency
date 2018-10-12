@@ -126,7 +126,7 @@ class MongoLock implements Lock
             if ($result) {
                 if ($now > $timeLimit) {
                     throw new LockNotAvailableException(
-                        "I have been waiting up until {$timeLimit->format(DateTime::ISO8601)} for the lock $this->programName ($maximumWaitingTime seconds polling every $polling seconds), but it is still not available (now is {$now->format(DateTime::ISO8601)})."
+                        "I have been waiting up until {$timeLimit->format(DateTime::ATOM)} for the lock $this->programName ($maximumWaitingTime seconds polling every $polling seconds), but it is still not available (now is {$now->format(DateTime::ATOM)})."
                     );
                 }
                 call_user_func($this->sleep, $polling);
@@ -151,7 +151,7 @@ class MongoLock implements Lock
         $datetime = new DateTime();
         $datetime->setTimestamp($field->sec);
         $datetime->setTimezone(new DateTimeZone('UTC'));
-        $field = $datetime->format(DateTime::ISO8601);
+        $field = $datetime->format(DateTime::ATOM);
     }
 
     private function lockRefreshed($result)

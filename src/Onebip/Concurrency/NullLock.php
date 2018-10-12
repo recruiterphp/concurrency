@@ -34,7 +34,7 @@ class NullLock implements Lock
         return [
             'program' => 'null-lock',
             'acquired_at' => '1970-01-01T00:00:00+00:00',
-            'expires_at' => '1970-01-01T00:00:00+00:00',
+            'expires_at' => '2100-01-01T00:00:00+00:00',
         ];
     }
 

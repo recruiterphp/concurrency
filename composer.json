@@ -1,8 +1,9 @@
 {
-    "name": "onebip/onebip-concurrency",
+    "name": "easywelfare/onebip-concurrency",
+    "description": "MongoDB-based locking system",
     "license": "MIT",
     "require": {
-        "php": ">=5.6.0",
+        "php": "^7.2",
         "onebip/onebip-clock": "dev-master"
     },
     "require-dev": {
@@ -16,5 +17,8 @@
         "psr-0": {
             "Onebip\\": "src/"
         }
+    },
+    "replace": {
+        "onebip/onebip-concurrency": "self.version"
     }
 }

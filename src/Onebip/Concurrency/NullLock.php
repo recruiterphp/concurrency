@@ -45,4 +45,9 @@ class NullLock implements Lock
     public function wait($polling = 30, $maximumWaitingTime = 3600): void
     {
     }
+
+    public function __toString(): string
+    {
+        return 'No locking';
+    }
 }

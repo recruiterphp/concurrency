@@ -33,4 +33,9 @@ interface Lock
      * @param $maximumWaitingTime (in seconds)
      */
     public function wait($polling = 30, $maximumWaitingTime = 3600): void;
+
+    /**
+     * @return string
+     */
+    public function __toString(): string;
 }

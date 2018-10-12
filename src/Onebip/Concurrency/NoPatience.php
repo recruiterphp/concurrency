@@ -1,4 +1,5 @@
 <?php
+
 namespace Onebip\Concurrency;
 
 class NoPatience implements Patience

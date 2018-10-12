@@ -1,12 +1,13 @@
 <?php
+
 namespace Onebip\Concurrency;
+
+use DateInterval;
+use DateTime;
+use DateTimeZone;
 use MongoCollection;
 use MongoCursorException;
 use MongoDate;
-use DateTime;
-use DateTimeZone;
-use DateInterval;
-use Onebip\Clock;
 use Onebip\Clock\SystemClock;
 
 class MongoLock implements Lock
@@ -21,7 +22,7 @@ class MongoLock implements Lock
         $this->collection->ensureIndex(['program' => 1], ['unique' => true]);
         $this->programName = $programName;
         $this->processName = $processName;
-        if ($clock === null) {
+        if (null === $clock) {
             $clock = new SystemClock();
         }
         $this->clock = $clock;
@@ -51,7 +52,7 @@ class MongoLock implements Lock
             ];
             $this->collection->insert($document);
         } catch (MongoCursorException $e) {
-            if ($e->getCode() == self::DUPLICATE_KEY) {
+            if (self::DUPLICATE_KEY == $e->getCode()) {
                 throw new LockNotAvailableException(
                     "{$this->processName} cannot acquire a lock for the program {$this->programName}"
                 );
@@ -91,6 +92,7 @@ class MongoLock implements Lock
             $this->convertToIso8601String($document['expires_at']);
             unset($document['_id']);
         }
+
         return $document;
     }
 
@@ -102,7 +104,7 @@ class MongoLock implements Lock
         }
         $operationResult = $this->collection->remove($query);
         $affectedDocuments = $operationResult['n'];
-        if ($affectedDocuments != 1) {
+        if (1 != $affectedDocuments) {
             throw new LockNotAvailableException(
                 "{$this->processName} does not have a lock for {$this->programName} to release"
             );
@@ -110,8 +112,8 @@ class MongoLock implements Lock
     }
 
     /**
-     * @param integer $polling  how frequently to check the lock presence
-     * @param integer $maximumWaitingTime  a limit to the waiting
+     * @param int $polling            how frequently to check the lock presence
+     * @param int $maximumWaitingTime a limit to the waiting
      */
     public function wait($polling = 30, $maximumWaitingTime = 3600): void
     {
@@ -157,7 +159,7 @@ class MongoLock implements Lock
     private function lockRefreshed($result): bool
     {
         if (isset($result['n'])) {
-            return $result['n'] === 1;
+            return 1 === $result['n'];
         }
         // result is not known (write concern is not set) so we check to see if
         // a lock document exists, if lock document exists we are pretty sure

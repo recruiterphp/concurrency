@@ -1,4 +1,5 @@
 <?php
+
 namespace Onebip\Concurrency;
 
 use Eris;
@@ -22,12 +23,12 @@ class PeriodicalCheckTest extends TestCase
                 )
             )
             //->hook(Listener\collectFrequencies())
-            ->then(function($startingDate, $period, $deltas) {
+            ->then(function ($startingDate, $period, $deltas) {
                 $clock = new SettableClock($startingDate);
                 $check = PeriodicalCheck::every($period, $clock);
                 $this->counter = 0;
-                $check->onFire(function() {
-                    $this->counter++;
+                $check->onFire(function () {
+                    ++$this->counter;
                 });
                 $check->__invoke();
                 foreach ($deltas as $delta) {
@@ -38,7 +39,6 @@ class PeriodicalCheckTest extends TestCase
                 $maximumNumberOfCalls = ceil($totalInterval / $period);
                 $actualNumberOfCallsExcludingTheFirst = $this->counter - 1;
                 $this->assertLessThanOrEqual($maximumNumberOfCalls, $actualNumberOfCallsExcludingTheFirst);
-
             });
     }
 }

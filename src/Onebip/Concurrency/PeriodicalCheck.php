@@ -1,8 +1,9 @@
 <?php
+
 namespace Onebip\Concurrency;
 
-use Onebip\Clock\SystemClock;
 use Onebip\Clock;
+use Onebip\Clock\SystemClock;
 
 class PeriodicalCheck
 {
@@ -11,12 +12,13 @@ class PeriodicalCheck
 
     public static function every($seconds, Clock $clock = null)
     {
-        if ($clock === null) {
+        if (null === $clock) {
             $clock = new SystemClock();
         }
+
         return new self($seconds, $clock);
     }
-    
+
     private function __construct($seconds, $clock)
     {
         $this->seconds = $seconds;
@@ -27,6 +29,7 @@ class PeriodicalCheck
     public function onFire(callable $check)
     {
         $this->check = $check;
+
         return $this;
     }
 

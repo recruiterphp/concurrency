@@ -1,15 +1,16 @@
 <?php
+
 namespace Onebip\Concurrency;
 
 class Poison
 {
     private $programName;
-    
+
     public static function forProgram($programName)
     {
         return new self($programName);
     }
-    
+
     private function __construct($programName)
     {
         $this->programName = $programName;
@@ -17,6 +18,7 @@ class Poison
 
     /**
      * @param int $timeLimit in seconds
+     *
      * @return self
      */
     public function drinkAfter($timeLimit)
@@ -42,7 +44,7 @@ class Poison
 
     private function sleepUntilThereIsSomethingInteresting($timeLimit, $child)
     {
-        pcntl_signal(SIGALRM, [$this, "alarm"], true);
+        pcntl_signal(SIGALRM, [$this, 'alarm'], true);
         pcntl_alarm($timeLimit);
         pcntl_waitpid($child, $status);
         //pcntl_signal_dispatch();
@@ -60,6 +62,6 @@ class Poison
 
     private function kill($pid)
     {
-        posix_kill($pid, 9); 
+        posix_kill($pid, 9);
     }
 }

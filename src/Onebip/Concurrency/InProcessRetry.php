@@ -3,6 +3,7 @@
 namespace Onebip\Concurrency;
 
 use Exception;
+use InvalidArgumentException;
 
 class InProcessRetry
 {
@@ -40,6 +41,6 @@ class InProcessRetry
                 }
             }
         }
-        throw $e;
+        throw $e ?? new InvalidArgumentException("Invalid number of retries: $possibleRetries");
     }
 }

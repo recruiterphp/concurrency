@@ -5,7 +5,7 @@
     "require": {
         "php": "^7.2",
         "onebip/onebip-clock": "dev-master",
-        "alcaeus/mongo-php-adapter": "^1.1"
+        "mongodb/mongodb": "^1.4"
     },
     "require-dev": {
         "phpunit/phpunit": "@stable",

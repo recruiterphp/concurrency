@@ -25,7 +25,7 @@ class Poison
     {
         $pid = pcntl_fork();
         if (!($pid >= 0)) {
-            throw new RuntimeException("Cannot fork {$this->programName} to perform timeout checks. The script will not run.");
+            throw new \RuntimeException("Cannot fork {$this->programName} to perform timeout checks. The script will not run.");
         }
         if ($pid) {
             // we are in father

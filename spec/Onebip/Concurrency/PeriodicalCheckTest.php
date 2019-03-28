@@ -12,6 +12,8 @@ class PeriodicalCheckTest extends TestCase
 {
     use Eris\TestTrait;
 
+    private $counter;
+
     public function testDoesNotPerformTheCheckTooManyTimes()
     {
         $this

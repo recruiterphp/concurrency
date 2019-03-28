@@ -5,7 +5,7 @@ namespace Onebip\Concurrency;
 use DateTime;
 use Eris;
 use Eris\Generator;
-use MongoClient;
+use MongoDB;
 use Phake;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
@@ -14,9 +14,14 @@ class MongoLockTest extends TestCase
 {
     use Eris\TestTrait;
 
+    private $lockCollection;
+    private $clock;
+    private $slept;
+    private $sleep;
+
     public function setUp()
     {
-        $this->lockCollection = (new MongoClient())->test->lock;
+        $this->lockCollection = (new MongoDB\Client())->test->lock;
         $this->clock = Phake::mock('Onebip\Clock');
 
         $this->slept = [];

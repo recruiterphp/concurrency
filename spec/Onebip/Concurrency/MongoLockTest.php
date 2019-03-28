@@ -127,8 +127,8 @@ class MongoLockTest extends TestCase
             [
                 'program' => 'windows_defrag',
                 'process' => 'ws-a-25:42',
-                'acquired_at' => '2014-01-01T00:00:00+0000',
-                'expires_at' => '2014-01-01T01:00:00+0000',
+                'acquired_at' => '2014-01-01T00:00:00+00:00',
+                'expires_at' => '2014-01-01T01:00:00+00:00',
             ],
             $second->show()
         );
@@ -169,7 +169,7 @@ class MongoLockTest extends TestCase
             $this->fail('Should fail after 60 seconds');
         } catch (LockNotAvailableException $e) {
             $this->assertEquals(
-                'I have been waiting up until 2014-01-01T00:01:00+0000 for the lock windows_defrag (60 seconds polling every 30 seconds), but it is still not available (now is 2014-01-01T00:01:01+0000).',
+                'I have been waiting up until 2014-01-01T00:01:00+00:00 for the lock windows_defrag (60 seconds polling every 30 seconds), but it is still not available (now is 2014-01-01T00:01:01+00:00).',
                 $e->getMessage()
             );
         }
@@ -210,8 +210,8 @@ class MongoLockTest extends TestCase
             [
                 'program' => 'windows_defrag',
                 'process' => 'ws-a-25:42',
-                'acquired_at' => '2014-01-01T00:00:00+0000',
-                'expires_at' => '2014-01-01T01:10:00+0000',
+                'acquired_at' => '2014-01-01T00:00:00+00:00',
+                'expires_at' => '2014-01-01T01:10:00+00:00',
             ],
             $second->show()
         );

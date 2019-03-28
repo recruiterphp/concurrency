@@ -7,8 +7,10 @@ use Onebip\Clock\SystemClock;
 
 class PeriodicalCheck
 {
-    private $seconds;
+    private $check;
     private $clock;
+    private $lastCheck;
+    private $seconds;
 
     public static function every($seconds, Clock $clock = null)
     {

@@ -7,9 +7,10 @@ class Timeout
     private $maximum;
     private $elapsed = 0;
     private $waitingFor;
+    private $afterCheck;
 
     /**
-     * @param int
+     * @param int             $timeout
      * @param string|callable $waitingFor
      */
     public static function inSeconds($timeout, $waitingFor = '')

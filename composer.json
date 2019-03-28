@@ -2,10 +2,14 @@
     "name": "easywelfare/onebip-concurrency",
     "description": "MongoDB-based locking system",
     "license": "MIT",
+    "repositories": [
+        {"type": "git", "url": "git@github.com:EasyWelfare/onebip-clock.git"}
+    ],
     "require": {
         "php": "^7.2",
-        "onebip/onebip-clock": "dev-master",
-        "alcaeus/mongo-php-adapter": "^1.1"
+        "ext-mongodb": ">=1.2",
+        "onebip/onebip-clock": "^2",
+        "mongodb/mongodb": "^1.4"
     },
     "require-dev": {
         "phpunit/phpunit": "@stable",

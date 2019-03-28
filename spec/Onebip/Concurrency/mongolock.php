@@ -17,7 +17,7 @@ if (!$argv[2]) {
 }
 $operations = explode(',', $argv[2]);
 
-$lockCollection = (new MongoClient())->test->lock;
+$lockCollection = (new MongoDB\Client())->test->lock;
 $lock = new MongoLock($lockCollection, 'ilium_gate', $name);
 $log = function ($data) {
     fputcsv(

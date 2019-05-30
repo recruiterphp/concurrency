@@ -88,7 +88,7 @@ class MongoLock implements Lock
     public function show(): ?array
     {
         $document = $this->collection->findOne(
-            ['program' => $this->programName],
+            ['program' => $this->programName, 'process' => $this->processName],
             ['typeMap' => ['root' => 'array']]
         );
 

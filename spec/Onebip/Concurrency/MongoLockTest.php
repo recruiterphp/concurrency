@@ -58,6 +58,21 @@ class MongoLockTest extends TestCase
         // $this->assertTrue(true, 'make PHPUnit happy');
     }
 
+    /**
+     * @expectedException \Onebip\Concurrency\LockNotAvailableException
+     * @expectedExceptionMessage ws-a-30:23 cannot acquire a lock for the program windows_defrag
+     */
+    public function testAnAlreadyAcquiredLockCannotBeAcquiredAgainEvenWithRefreshMethod()
+    {
+        $this->givenTimeIsFixed();
+        $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
+        $first->acquire();
+
+        $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
+        $second->refresh();
+        // $this->assertTrue(true, 'make PHPUnit happy');
+    }
+
     public function testAnAlreadyAcquiredLockCanExpireSoThatItCanBeAcquiredAgain()
     {
         Phake::when($this->clock)->current()

@@ -166,8 +166,9 @@ class MongoLock implements Lock
 
     private function lockRefreshed($result): bool
     {
-        if (1 === $result->getModifiedCount()) {
-            return true;
+        $modified = $result->getModifiedCount();
+        if (!is_null($modified)) {
+            return 1 === $modified;
         }
 
         // result is not known (write concern is not set) so we check to see if

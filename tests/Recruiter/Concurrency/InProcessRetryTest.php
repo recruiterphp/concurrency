@@ -1,6 +1,6 @@
 <?php
 
-namespace RecruiterPhp\Concurrency;
+namespace Recruiter\Concurrency;
 
 use Exception;
 use InvalidArgumentException;

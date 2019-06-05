@@ -1,7 +1,7 @@
 <?php
 
-use RecruiterPhp\Concurrency\LockNotAvailableException;
-use RecruiterPhp\Concurrency\MongoLock;
+use Recruiter\Concurrency\LockNotAvailableException;
+use Recruiter\Concurrency\MongoLock;
 
 require __DIR__ . '/../../../vendor/autoload.php';
 

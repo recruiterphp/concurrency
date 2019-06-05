@@ -1,9 +1,9 @@
 <?php
 
-namespace RecruiterPhp\Concurrency;
+namespace Recruiter\Concurrency;
 
-use RecruiterPhp\Clock;
-use RecruiterPhp\Clock\SystemClock;
+use Recruiter\Clock;
+use Recruiter\Clock\SystemClock;
 
 class PeriodicalCheck
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace RecruiterPhp\Concurrency;
+namespace Recruiter\Concurrency;
 
 use Eris;
 use Eris\Generator;
 use Eris\Listener;
 use PHPUnit\Framework\TestCase;
-use RecruiterPhp\Clock\SettableClock;
+use Recruiter\Clock\SettableClock;
 
 class PeriodicalCheckTest extends TestCase
 {

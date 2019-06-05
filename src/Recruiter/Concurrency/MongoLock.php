@@ -1,13 +1,13 @@
 <?php
 
-namespace RecruiterPhp\Concurrency;
+namespace Recruiter\Concurrency;
 
 use DateInterval;
 use DateTime;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
 use MongoDB\Driver\Exception\BulkWriteException;
-use RecruiterPhp\Clock\SystemClock;
+use Recruiter\Clock\SystemClock;
 
 class MongoLock implements Lock
 {

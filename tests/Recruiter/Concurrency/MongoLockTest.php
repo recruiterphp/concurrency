@@ -1,6 +1,6 @@
 <?php
 
-namespace RecruiterPhp\Concurrency;
+namespace Recruiter\Concurrency;
 
 use DateTime;
 use Eris;
@@ -22,7 +22,7 @@ class MongoLockTest extends TestCase
     public function setUp()
     {
         $this->lockCollection = (new MongoDB\Client())->test->lock;
-        $this->clock = Phake::mock('RecruiterPhp\Clock');
+        $this->clock = Phake::mock('Recruiter\Clock');
 
         $this->slept = [];
         $this->sleep = function ($amount) {
@@ -44,7 +44,7 @@ class MongoLockTest extends TestCase
     }
 
     /**
-     * @expectedException \RecruiterPhp\Concurrency\LockNotAvailableException
+     * @expectedException \Recruiter\Concurrency\LockNotAvailableException
      * @expectedExceptionMessage ws-a-30:23 cannot acquire a lock for the program windows_defrag
      */
     public function testAnAlreadyAcquiredLockCannotBeAcquiredAgain()
@@ -59,7 +59,7 @@ class MongoLockTest extends TestCase
     }
 
     /**
-     * @expectedException \RecruiterPhp\Concurrency\LockNotAvailableException
+     * @expectedException \Recruiter\Concurrency\LockNotAvailableException
      * @expectedExceptionMessage ws-a-30:23 cannot acquire a lock for the program windows_defrag
      */
     public function testAnAlreadyAcquiredLockCannotBeAcquiredAgainEvenWithRefreshMethod()
@@ -111,7 +111,7 @@ class MongoLockTest extends TestCase
     }
 
     /**
-     * @expectedException \RecruiterPhp\Concurrency\LockNotAvailableException
+     * @expectedException \Recruiter\Concurrency\LockNotAvailableException
      * @expectedExceptionMessage ws-a-30:23 does not have a lock for windows_defrag to release
      */
     public function testALockCannotBeReleasedBySomeoneElseThanTheProcessAcquiringIt()
@@ -238,7 +238,7 @@ class MongoLockTest extends TestCase
     }
 
     /**
-     * @expectedException \RecruiterPhp\Concurrency\LockNotAvailableException
+     * @expectedException \Recruiter\Concurrency\LockNotAvailableException
      * @expectedExceptionMessage ws-a-25:42 cannot acquire a lock for the program windows_defrag
      */
     public function testAnExpiredLockCannotBeRefreshed()

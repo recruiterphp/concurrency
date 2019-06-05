@@ -1,14 +1,11 @@
 {
-    "name": "easywelfare/onebip-concurrency",
+    "name": "recruiterphp/concurrency",
     "description": "MongoDB-based locking system",
     "license": "MIT",
-    "repositories": [
-        {"type": "git", "url": "git@github.com:EasyWelfare/onebip-clock.git"}
-    ],
     "require": {
         "php": "^7.2",
         "ext-mongodb": ">=1.2",
-        "onebip/onebip-clock": "^2",
+        "recruiterphp/clock": "^3",
         "mongodb/mongodb": "^1.4"
     },
     "require-dev": {
@@ -20,10 +17,10 @@
     },
     "autoload": {
         "psr-0": {
-            "Onebip\\": "src/"
+            "RecruiterPhp\\": "src/"
         }
     },
     "replace": {
-        "onebip/onebip-concurrency": "self.version"
+        "recruiterphp/concurrency": "self.version"
     }
 }

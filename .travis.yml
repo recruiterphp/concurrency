@@ -7,7 +7,7 @@ before_script:
   - "phpenv config-add phpconfig.ini"
   - "composer install"
 script:
-  - "vendor/bin/phpunit --exclude-group long spec"
-  - "vendor/bin/phpunit --group long spec"
+  - "vendor/bin/phpunit --exclude-group long tests"
+  - "vendor/bin/phpunit --group long tests"
 sudo: false
 services: mongodb

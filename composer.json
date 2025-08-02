@@ -2,6 +2,12 @@
     "name": "recruiterphp/concurrency",
     "description": "MongoDB-based locking system",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Contributors",
+            "homepage": "https://github.com/recruiterphp/concurrency/graphs/contributors"
+        }
+    ],
     "require": {
         "php": "^8.4",
         "ext-mongodb": "*",

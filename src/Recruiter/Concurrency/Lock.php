@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Recruiter\Concurrency;
 
 interface Lock
 {
     /**
-     * @throws LockNotAvailableException
-     *
      * @param int $duration (in seconds)
+     *
+     * @throws LockNotAvailableException
      */
     public function acquire($duration = 360): void;
 
@@ -17,9 +19,9 @@ interface Lock
     public function release($force = false): void;
 
     /**
-     * @throws LockNotavailableexception
-     *
      * @param int $duration (in seconds)
+     *
+     * @throws LockNotAvailableException
      */
     public function refresh($duration = 3600): void;
 
@@ -34,8 +36,5 @@ interface Lock
      */
     public function wait($polling = 30, $maximumWaitingTime = 3600): void;
 
-    /**
-     * @return string
-     */
     public function __toString(): string;
 }

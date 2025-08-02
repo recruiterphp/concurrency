@@ -1,9 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Recruiter\Concurrency;
 
-use RuntimeException;
-
-class LockNotAvailableException extends RuntimeException
+class LockNotAvailableException extends \RuntimeException
 {
 }

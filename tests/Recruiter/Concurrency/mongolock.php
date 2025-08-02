@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Recruiter\Concurrency\LockNotAvailableException;
 use Recruiter\Concurrency\MongoLock;
 
@@ -17,7 +19,8 @@ if (!$argv[2]) {
 }
 $operations = explode(',', $argv[2]);
 
-$lockCollection = (new MongoDB\Client())->test->lock;
+$uri = getenv('MONGODB_URI') ?: null;
+$lockCollection = new MongoDB\Client($uri)->selectCollection('concurrency-test', 'lock');
 $lock = new MongoLock($lockCollection, 'ilium_gate', $name);
 $log = function ($data) {
     fputcsv(
@@ -26,8 +29,11 @@ $log = function ($data) {
             [
                 'time' => (int) (microtime(true) * 1000000),
             ],
-            $data
-        )
+            $data,
+        ),
+        ',',
+        '"',
+        '',
     );
 };
 foreach ($operations as $operation) {

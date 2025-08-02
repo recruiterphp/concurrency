@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Recruiter\Concurrency\LockNotAvailableException;
 use Recruiter\Concurrency\MongoLock;
 
@@ -27,7 +29,7 @@ $log = function ($data) {
             [
                 'time' => (int) (microtime(true) * 1000000),
             ],
-            $data
+            $data,
         ),
         ',',
         '"',

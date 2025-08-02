@@ -1,9 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Recruiter\Concurrency;
 
-use Exception;
-use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -45,7 +45,7 @@ class InProcessRetryTest extends TestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testPerformsOnceATaskIfItIsSuccessful(): void
     {
@@ -55,7 +55,7 @@ class InProcessRetryTest extends TestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testReturnsTheValueReturnedByTheTask(): void
     {
@@ -64,7 +64,7 @@ class InProcessRetryTest extends TestCase
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testInCaseOfSpecifiedExceptionRetriesOnceByDefault(): void
     {
@@ -72,13 +72,13 @@ class InProcessRetryTest extends TestCase
         try {
             $retry->__invoke();
             $this->fail('Should let the 2nd InvalidArgumentException bubble up');
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
         }
         $this->assertEquals(2, $this->count);
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testInCaseOfSpecifiedExceptionRetriesReturnTheOriginalValueReturnedByTheTask(): void
     {
@@ -92,34 +92,36 @@ class InProcessRetryTest extends TestCase
         try {
             $retry->__invoke();
             $this->fail('Should let the 1st Exception bubble up');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
         }
         $this->assertEquals(1, $this->count);
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCanPerformMultipleRetriesUntilAnHappyReturn(): void
     {
         $failures = 4;
         $retry = InProcessRetry::of($this->limitedExceptionalCounterFactory('InvalidArgumentException', $failures), 'InvalidArgumentException')
-            ->forTimes($failures);
+            ->forTimes($failures)
+        ;
         $this->assertEquals($totalCalls = $failures + 1, $retry->__invoke());
     }
 
     /**
-     * @throws Exception
+     * @throws \Exception
      */
     public function testCanPerformMultipleRetriesUntilTheyAreFinished(): void
     {
         $failures = 4;
         $retry = InProcessRetry::of($this->exceptionalCounterFactory('InvalidArgumentException', $failures), 'InvalidArgumentException')
-            ->forTimes($failures);
+            ->forTimes($failures)
+        ;
         try {
             $retry->__invoke();
             $this->fail('Even multiple invocations should always fail.');
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $e) {
             $this->assertEquals($totalCalls = $failures + 1, $this->count);
         }
     }

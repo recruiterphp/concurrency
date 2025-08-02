@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Recruiter\Concurrency;
 
-use DateTime;
 use Eris;
 use Eris\Generator;
 use MongoDB;
@@ -26,7 +27,7 @@ class MongoLockTest extends TestCase
     {
         $uri = getenv('MONGODB_URI') ?: null;
         $this->lockCollection = new MongoDB\Client($uri)->selectCollection('concurrency-test', 'lock');
-        $this->clock = Phake::mock(Clock::class);
+        $this->clock = \Phake::mock(Clock::class);
 
         $this->slept = [];
         $this->sleep = function ($amount) {
@@ -55,7 +56,7 @@ class MongoLockTest extends TestCase
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
 
-        $this->expectExceptionMessage("ws-a-30:23 cannot acquire a lock for the program windows_defrag");
+        $this->expectExceptionMessage('ws-a-30:23 cannot acquire a lock for the program windows_defrag');
         $this->expectException(LockNotAvailableException::class);
 
         $second->acquire();
@@ -69,7 +70,7 @@ class MongoLockTest extends TestCase
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
 
-        $this->expectExceptionMessage("ws-a-30:23 cannot acquire a lock for the program windows_defrag");
+        $this->expectExceptionMessage('ws-a-30:23 cannot acquire a lock for the program windows_defrag');
         $this->expectException(LockNotAvailableException::class);
 
         $second->refresh();
@@ -78,9 +79,9 @@ class MongoLockTest extends TestCase
 
     public function testAnAlreadyAcquiredLockCanExpireSoThatItCanBeAcquiredAgain()
     {
-        Phake::when($this->clock)->current()
-            ->thenReturn(new DateTime('2014-01-01T10:00:00Z'))
-            ->thenReturn(new DateTime('2014-01-01T11:00:01Z'))
+        \Phake::when($this->clock)->current()
+            ->thenReturn(new \DateTime('2014-01-01T10:00:00Z'))
+            ->thenReturn(new \DateTime('2014-01-01T11:00:01Z'))
         ;
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire(3600);
@@ -119,7 +120,7 @@ class MongoLockTest extends TestCase
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire();
 
-        $this->expectExceptionMessage("ws-a-30:23 does not have a lock for windows_defrag to release");
+        $this->expectExceptionMessage('ws-a-30:23 does not have a lock for windows_defrag to release');
         $this->expectException(LockNotAvailableException::class);
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
@@ -139,8 +140,9 @@ class MongoLockTest extends TestCase
 
     public function testALockCanBeShownEvenByOtherProcessesWorkingOnTheSameProgram()
     {
-        Phake::when($this->clock)->current()
-            ->thenReturn(new DateTime('2014-01-01T00:00:00Z'));
+        \Phake::when($this->clock)->current()
+            ->thenReturn(new \DateTime('2014-01-01T00:00:00Z'))
+        ;
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire(3600);
 
@@ -152,19 +154,20 @@ class MongoLockTest extends TestCase
                 'acquired_at' => '2014-01-01T00:00:00+00:00',
                 'expires_at' => '2014-01-01T01:00:00+00:00',
             ],
-            $second->show()
+            $second->show(),
         );
         $this->assertTrue(true, 'make PHPUnit happy');
     }
 
     public function testALockCanBeWaitedOnUntilItsDisappearance()
     {
-        $allCalls = Phake::when($this->clock)->current()
-            ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:30Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:01:00Z'));
+        $allCalls = \Phake::when($this->clock)->current()
+            ->thenReturn(new \DateTime('2014-01-01T00:00:00Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:00:00Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:00:00Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:00:30Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:01:00Z'))
+        ;
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire(45);
 
@@ -175,13 +178,14 @@ class MongoLockTest extends TestCase
 
     public function testALockShouldNotBeWaitedUponForever()
     {
-        $allCalls = Phake::when($this->clock)->current()
-            ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:30Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:50Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:01:01Z'))
-            ->thenThrow(new \LogicException('Should not call anymore'));
+        $allCalls = \Phake::when($this->clock)->current()
+            ->thenReturn(new \DateTime('2014-01-01T00:00:00Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:00:00Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:00:30Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:00:50Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:01:01Z'))
+            ->thenThrow(new \LogicException('Should not call anymore'))
+        ;
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire(3600);
 
@@ -192,21 +196,21 @@ class MongoLockTest extends TestCase
         } catch (LockNotAvailableException $e) {
             $this->assertEquals(
                 'I have been waiting up until 2014-01-01T00:01:00+00:00 for the lock windows_defrag (60 seconds polling every 30 seconds), but it is still not available (now is 2014-01-01T00:01:01+00:00).',
-                $e->getMessage()
+                $e->getMessage(),
             );
         }
     }
 
     public function testALockWaitedUponCanBeImmediatelyReacquired()
     {
-        $allCalls = Phake::when($this->clock)->current()
-            ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:30Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:30Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:30Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:31Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:00:31Z'))
-            ;
+        $allCalls = \Phake::when($this->clock)->current()
+            ->thenReturn(new \DateTime('2014-01-01T00:00:00Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:00:30Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:00:30Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:00:30Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:00:31Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:00:31Z'))
+        ;
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire(30);
 
@@ -218,9 +222,10 @@ class MongoLockTest extends TestCase
 
     public function testAnAlreadyAcquiredLockCanBeRefreshed()
     {
-        Phake::when($this->clock)->current()
-            ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
-            ->thenReturn(new DateTime('2014-01-01T00:10:00Z'));
+        \Phake::when($this->clock)->current()
+            ->thenReturn(new \DateTime('2014-01-01T00:00:00Z'))
+            ->thenReturn(new \DateTime('2014-01-01T00:10:00Z'))
+        ;
 
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire();
@@ -235,20 +240,21 @@ class MongoLockTest extends TestCase
                 'acquired_at' => '2014-01-01T00:00:00+00:00',
                 'expires_at' => '2014-01-01T01:10:00+00:00',
             ],
-            $second->show()
+            $second->show(),
         );
     }
 
     public function testAnExpiredLockCannotBeRefreshed()
     {
-        Phake::when($this->clock)->current()
-            ->thenReturn(new DateTime('2014-01-01T00:00:00Z'))
-            ->thenReturn(new DateTime('2014-01-01T02:00:00Z'));
+        \Phake::when($this->clock)->current()
+            ->thenReturn(new \DateTime('2014-01-01T00:00:00Z'))
+            ->thenReturn(new \DateTime('2014-01-01T02:00:00Z'))
+        ;
 
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire();
 
-        $this->expectExceptionMessage("ws-a-25:42 cannot acquire a lock for the program windows_defrag");
+        $this->expectExceptionMessage('ws-a-25:42 cannot acquire a lock for the program windows_defrag');
         $this->expectException(LockNotAvailableException::class);
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
@@ -257,7 +263,7 @@ class MongoLockTest extends TestCase
 
     private function givenTimeIsFixed()
     {
-        Phake::when($this->clock)->current()->thenReturn(new DateTime('2014-01-01'));
+        \Phake::when($this->clock)->current()->thenReturn(new \DateTime('2014-01-01'));
     }
 
     #[Group('long')]
@@ -269,10 +275,10 @@ class MongoLockTest extends TestCase
                 Generator\vector(
                     2,
                     Generator\seq(
-                        Generator\elements(['acquire', 'release'])
+                        Generator\elements(['acquire', 'release']),
                         // TODO: add 'sleep'
-                    )
-                )
+                    ),
+                ),
             )
             ->when(function ($sequencesOfSteps) {
                 foreach ($sequencesOfSteps as $sequence) {
@@ -306,7 +312,8 @@ class MongoLockTest extends TestCase
                 $process->run();
                 $this->assertExitedCorrectly($process, "Non-linearizable history in $log");
                 ++$this->iteration;
-            });
+            })
+        ;
     }
 
     private function assertExitedCorrectly($process, $errorMessage): void
@@ -316,7 +323,7 @@ class MongoLockTest extends TestCase
             $process->getExitCode(),
             $errorMessage . PHP_EOL .
             $process->getErrorOutput() . PHP_EOL .
-            $process->getOutput()
+            $process->getOutput(),
         );
     }
 }

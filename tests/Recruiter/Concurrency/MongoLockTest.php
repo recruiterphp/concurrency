@@ -7,22 +7,26 @@ use Eris;
 use Eris\Generator;
 use MongoDB;
 use Phake;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Recruiter\Clock;
 use Symfony\Component\Process\Process;
 
 class MongoLockTest extends TestCase
 {
     use Eris\TestTrait;
 
-    private $lockCollection;
-    private $clock;
-    private $slept;
-    private $sleep;
+    private MongoDB\Collection $lockCollection;
+    private Clock&Phake\IMock $clock;
+    private array $slept;
+    private \Closure $sleep;
+    private int $iteration;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->lockCollection = (new MongoDB\Client())->test->lock;
-        $this->clock = Phake::mock('Recruiter\Clock');
+        $uri = getenv('MONGODB_URI') ?: null;
+        $this->lockCollection = new MongoDB\Client($uri)->selectCollection('concurrency-test', 'lock');
+        $this->clock = Phake::mock(Clock::class);
 
         $this->slept = [];
         $this->sleep = function ($amount) {
@@ -30,7 +34,7 @@ class MongoLockTest extends TestCase
         };
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         $this->lockCollection->drop();
     }
@@ -43,10 +47,6 @@ class MongoLockTest extends TestCase
         $this->assertTrue(true, 'make PHPUnit happy');
     }
 
-    /**
-     * @expectedException \Recruiter\Concurrency\LockNotAvailableException
-     * @expectedExceptionMessage ws-a-30:23 cannot acquire a lock for the program windows_defrag
-     */
     public function testAnAlreadyAcquiredLockCannotBeAcquiredAgain()
     {
         $this->givenTimeIsFixed();
@@ -54,14 +54,13 @@ class MongoLockTest extends TestCase
         $first->acquire();
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
+
+        $this->expectExceptionMessage("ws-a-30:23 cannot acquire a lock for the program windows_defrag");
+        $this->expectException(LockNotAvailableException::class);
+
         $second->acquire();
-        // $this->assertTrue(true, 'make PHPUnit happy');
     }
 
-    /**
-     * @expectedException \Recruiter\Concurrency\LockNotAvailableException
-     * @expectedExceptionMessage ws-a-30:23 cannot acquire a lock for the program windows_defrag
-     */
     public function testAnAlreadyAcquiredLockCannotBeAcquiredAgainEvenWithRefreshMethod()
     {
         $this->givenTimeIsFixed();
@@ -69,6 +68,10 @@ class MongoLockTest extends TestCase
         $first->acquire();
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
+
+        $this->expectExceptionMessage("ws-a-30:23 cannot acquire a lock for the program windows_defrag");
+        $this->expectException(LockNotAvailableException::class);
+
         $second->refresh();
         // $this->assertTrue(true, 'make PHPUnit happy');
     }
@@ -110,15 +113,14 @@ class MongoLockTest extends TestCase
         $this->assertTrue(true, 'make PHPUnit happy');
     }
 
-    /**
-     * @expectedException \Recruiter\Concurrency\LockNotAvailableException
-     * @expectedExceptionMessage ws-a-30:23 does not have a lock for windows_defrag to release
-     */
     public function testALockCannotBeReleasedBySomeoneElseThanTheProcessAcquiringIt()
     {
         $this->givenTimeIsFixed();
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire();
+
+        $this->expectExceptionMessage("ws-a-30:23 does not have a lock for windows_defrag to release");
+        $this->expectException(LockNotAvailableException::class);
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
         $second->release();
@@ -237,10 +239,6 @@ class MongoLockTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \Recruiter\Concurrency\LockNotAvailableException
-     * @expectedExceptionMessage ws-a-25:42 cannot acquire a lock for the program windows_defrag
-     */
     public function testAnExpiredLockCannotBeRefreshed()
     {
         Phake::when($this->clock)->current()
@@ -249,6 +247,9 @@ class MongoLockTest extends TestCase
 
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire();
+
+        $this->expectExceptionMessage("ws-a-25:42 cannot acquire a lock for the program windows_defrag");
+        $this->expectException(LockNotAvailableException::class);
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $second->refresh();
@@ -259,9 +260,7 @@ class MongoLockTest extends TestCase
         Phake::when($this->clock)->current()->thenReturn(new DateTime('2014-01-01'));
     }
 
-    /**
-     * @group long
-     */
+    #[Group('long')]
     public function testPropertyBased()
     {
         $this->iteration = 0;
@@ -295,7 +294,7 @@ class MongoLockTest extends TestCase
                 foreach ($sequencesOfSteps as $i => $sequence) {
                     $processName = "p{$i}";
                     $steps = implode(',', $sequence);
-                    $process = new Process('exec php ' . __DIR__ . "/mongolock.php $processName $steps >> $log");
+                    $process = Process::fromShellCommandline('exec php ' . __DIR__ . "/mongolock.php $processName $steps >> $log");
                     $process->start();
                     $processes[] = $process;
                 }
@@ -303,14 +302,14 @@ class MongoLockTest extends TestCase
                     $process->wait();
                     $this->assertExitedCorrectly($process, 'Error in MongoLock run');
                 }
-                $process = new Process('exec java -jar ' . __DIR__ . "/knossos-recruiterphp.jar mongo-lock $log");
+                $process = Process::fromShellCommandline('exec java -jar ' . __DIR__ . "/knossos-recruiterphp.jar mongo-lock $log");
                 $process->run();
                 $this->assertExitedCorrectly($process, "Non-linearizable history in $log");
                 ++$this->iteration;
             });
     }
 
-    private function assertExitedCorrectly($process, $errorMessage)
+    private function assertExitedCorrectly($process, $errorMessage): void
     {
         $this->assertEquals(
             0,

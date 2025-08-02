@@ -21,7 +21,7 @@ interface Lock
     /**
      * @param int $duration (in seconds)
      *
-     * @throws LockNotavailableexception
+     * @throws LockNotAvailableException
      */
     public function refresh($duration = 3600): void;
 

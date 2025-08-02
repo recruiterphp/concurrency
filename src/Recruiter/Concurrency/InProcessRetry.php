@@ -1,9 +1,8 @@
 <?php
 
-namespace Recruiter\Concurrency;
+declare(strict_types=1);
 
-use Exception;
-use InvalidArgumentException;
+namespace Recruiter\Concurrency;
 
 class InProcessRetry
 {
@@ -35,12 +34,12 @@ class InProcessRetry
         for ($i = 0; $i <= $possibleRetries; ++$i) {
             try {
                 return call_user_func($this->what);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 if (!($e instanceof $this->exceptionClass)) {
                     throw $e;
                 }
             }
         }
-        throw $e ?? new InvalidArgumentException("Invalid number of retries: $possibleRetries");
+        throw $e ?? new \InvalidArgumentException("Invalid number of retries: $possibleRetries");
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Recruiter\Concurrency;
 
 use Eris;
@@ -12,7 +14,7 @@ class PeriodicalCheckTest extends TestCase
 {
     use Eris\TestTrait;
 
-    private $counter;
+    private int $counter;
 
     public function testDoesNotPerformTheCheckTooManyTimes()
     {
@@ -21,10 +23,10 @@ class PeriodicalCheckTest extends TestCase
                 Generator\date(),
                 Generator\choose(10, 30),
                 Generator\seq(
-                    Generator\choose(1, 60)
-                )
+                    Generator\choose(1, 60),
+                ),
             )
-            //->hook(Listener\collectFrequencies())
+            // ->hook(Listener\collectFrequencies())
             ->then(function ($startingDate, $period, $deltas) {
                 $clock = new SettableClock($startingDate);
                 $check = PeriodicalCheck::every($period, $clock);
@@ -41,6 +43,7 @@ class PeriodicalCheckTest extends TestCase
                 $maximumNumberOfCalls = ceil($totalInterval / $period);
                 $actualNumberOfCallsExcludingTheFirst = $this->counter - 1;
                 $this->assertLessThanOrEqual($maximumNumberOfCalls, $actualNumberOfCallsExcludingTheFirst);
-            });
+            })
+        ;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Recruiter\Concurrency;
 
 class Poison
@@ -47,12 +49,12 @@ class Poison
         pcntl_signal(SIGALRM, [$this, 'alarm'], true);
         pcntl_alarm($timeLimit);
         pcntl_waitpid($child, $status);
-        //pcntl_signal_dispatch();
+        // pcntl_signal_dispatch();
     }
 
     public function alarm()
     {
-        //error_log("Alarm has triggered");
+        // error_log("Alarm has triggered");
     }
 
     private function isAlive($pid)

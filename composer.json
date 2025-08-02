@@ -3,24 +3,31 @@
     "description": "MongoDB-based locking system",
     "license": "MIT",
     "require": {
-        "php": "^7.2",
-        "ext-mongodb": ">=1.2",
-        "recruiterphp/clock": "^3",
-        "mongodb/mongodb": "^1.4"
+        "php": "^8.4",
+        "ext-mongodb": "*",
+        "mongodb/mongodb": "^2.1",
+        "recruiterphp/clock": "^4.1"
     },
     "require-dev": {
-        "phpunit/phpunit": "@stable",
-        "phake/phake": "~2.1",
-        "giorgiosironi/eris": "dev-master",
-        "symfony/process": "~4.0",
-        "friendsofphp/php-cs-fixer": "^2.13"
+        "ergebnis/composer-normalize": "^2.47",
+        "friendsofphp/php-cs-fixer": "^3.85",
+        "giorgiosironi/eris": "^1.0",
+        "phake/phake": "^4.6",
+        "phpunit/phpunit": "^12.3",
+        "symfony/process": "^7.3"
+    },
+    "replace": {
+        "easywelfare/onebip-concurrency": "self.version",
+        "onebip/onebip-concurrency": "self.version"
     },
     "autoload": {
         "psr-0": {
             "Recruiter\\": "src/"
         }
     },
-    "replace": {
-        "recruiterphp/concurrency": "self.version"
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true
+        }
     }
 }

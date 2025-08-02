@@ -1,9 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Recruiter\Concurrency;
 
-use DateInterval;
-use DateTime;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
 use MongoDB\Driver\Exception\BulkWriteException;
@@ -11,7 +11,7 @@ use Recruiter\Clock\SystemClock;
 
 class MongoLock implements Lock
 {
-    const DUPLICATE_KEY = 11000;
+    public const DUPLICATE_KEY = 11000;
 
     private $collection;
     private $processName;
@@ -44,7 +44,7 @@ class MongoLock implements Lock
         $this->removeExpiredLocks($now);
 
         $expiration = clone $now;
-        $expiration->add(new DateInterval("PT{$duration}S"));
+        $expiration->add(new \DateInterval("PT{$duration}S"));
 
         try {
             $document = [
@@ -56,9 +56,7 @@ class MongoLock implements Lock
             $this->collection->insertOne($document);
         } catch (BulkWriteException $e) {
             if (self::DUPLICATE_KEY == $e->getCode()) {
-                throw new LockNotAvailableException(
-                    "{$this->processName} cannot acquire a lock for the program {$this->programName}"
-                );
+                throw new LockNotAvailableException("{$this->processName} cannot acquire a lock for the program {$this->programName}");
             }
             throw $e;
         }
@@ -71,17 +69,15 @@ class MongoLock implements Lock
         $this->removeExpiredLocks($now);
 
         $expiration = clone $now;
-        $expiration->add(new DateInterval("PT{$duration}S"));
+        $expiration->add(new \DateInterval("PT{$duration}S"));
 
         $result = $this->collection->updateOne(
             ['program' => $this->programName, 'process' => $this->processName],
-            ['$set' => ['expires_at' => new UTCDateTime($expiration)]]
+            ['$set' => ['expires_at' => new UTCDateTime($expiration)]],
         );
 
         if (!$this->lockRefreshed($result)) {
-            throw new LockNotAvailableException(
-                "{$this->processName} cannot acquire a lock for the program {$this->programName}, result is: " . var_export($result, true)
-            );
+            throw new LockNotAvailableException("{$this->processName} cannot acquire a lock for the program {$this->programName}, result is: " . var_export($result, true));
         }
     }
 
@@ -89,7 +85,7 @@ class MongoLock implements Lock
     {
         $document = $this->collection->findOne(
             ['program' => $this->programName, 'process' => $this->processName],
-            ['typeMap' => ['root' => 'array']]
+            ['typeMap' => ['root' => 'array']],
         );
 
         if (!is_null($document)) {
@@ -109,9 +105,7 @@ class MongoLock implements Lock
         }
         $operationResult = $this->collection->deleteMany($query);
         if (1 !== $operationResult->getDeletedCount()) {
-            throw new LockNotAvailableException(
-                "{$this->processName} does not have a lock for {$this->programName} to release"
-            );
+            throw new LockNotAvailableException("{$this->processName} does not have a lock for {$this->programName} to release");
         }
     }
 
@@ -121,7 +115,7 @@ class MongoLock implements Lock
      */
     public function wait($polling = 30, $maximumWaitingTime = 3600): void
     {
-        $timeLimit = $this->clock->current()->add(new DateInterval("PT{$maximumWaitingTime}S"));
+        $timeLimit = $this->clock->current()->add(new \DateInterval("PT{$maximumWaitingTime}S"));
         while (true) {
             $now = $this->clock->current();
             $result = $this->collection->count($query = [
@@ -131,9 +125,7 @@ class MongoLock implements Lock
 
             if ($result) {
                 if ($now > $timeLimit) {
-                    throw new LockNotAvailableException(
-                        "I have been waiting up until {$timeLimit->format(DateTime::ATOM)} for the lock $this->programName ($maximumWaitingTime seconds polling every $polling seconds), but it is still not available (now is {$now->format(DateTime::ATOM)})."
-                    );
+                    throw new LockNotAvailableException("I have been waiting up until {$timeLimit->format(\DateTime::ATOM)} for the lock $this->programName ($maximumWaitingTime seconds polling every $polling seconds), but it is still not available (now is {$now->format(\DateTime::ATOM)}).");
                 }
                 call_user_func($this->sleep, $polling);
             } else {
@@ -147,7 +139,7 @@ class MongoLock implements Lock
         return var_export($this->show(), true);
     }
 
-    private function removeExpiredLocks(DateTime $now): void
+    private function removeExpiredLocks(\DateTime $now): void
     {
         $this->collection->deleteMany($query = [
             'program' => $this->programName,
@@ -161,7 +153,7 @@ class MongoLock implements Lock
     {
         $datetime = $mongoDateTime->toDateTime();
 
-        return $datetime->format(DateTime::ATOM);
+        return $datetime->format(\DateTime::ATOM);
     }
 
     private function lockRefreshed($result): bool

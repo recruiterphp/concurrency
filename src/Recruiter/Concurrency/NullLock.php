@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Recruiter\Concurrency;
 
 class NullLock implements Lock
 {
     /**
-     * @throws LockNotAvailableException
-     *
      * @param int $duration (in seconds)
+     *
+     * @throws LockNotAvailableException
      */
     public function acquire($duration = 360): void
     {
@@ -21,9 +23,9 @@ class NullLock implements Lock
     }
 
     /**
-     * @throws LockNotavailableexception
-     *
      * @param int $duration (in seconds)
+     *
+     * @throws LockNotavailableexception
      */
     public function refresh($duration = 3600): void
     {

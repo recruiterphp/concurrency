@@ -115,7 +115,7 @@ class InProcessRetryTest extends TestCase
     public function testCanPerformMultipleRetriesUntilTheyAreFinished(): void
     {
         $failures = 4;
-        $retry = InProcessRetry::of($this->exceptionalCounterFactory('InvalidArgumentException', $failures), 'InvalidArgumentException')
+        $retry = InProcessRetry::of($this->exceptionalCounterFactory('InvalidArgumentException'), 'InvalidArgumentException')
             ->forTimes($failures)
         ;
         try {

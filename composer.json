@@ -21,7 +21,8 @@
         "phake/phake": "^4.6",
         "phpunit/phpunit": "^12.3",
         "symfony/process": "^7.3",
-        "phpstan/phpstan": "^2.1"
+        "phpstan/phpstan": "^2.1",
+        "rector/rector": "^2.1"
     },
     "replace": {
         "easywelfare/onebip-concurrency": "self.version",

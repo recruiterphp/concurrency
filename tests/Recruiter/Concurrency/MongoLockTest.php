@@ -30,7 +30,7 @@ class MongoLockTest extends TestCase
         $this->clock = \Phake::mock(Clock::class);
 
         $this->slept = [];
-        $this->sleep = function ($amount) {
+        $this->sleep = function ($amount): void {
             $this->slept[] = $amount;
         };
     }
@@ -289,7 +289,7 @@ class MongoLockTest extends TestCase
 
                 return true;
             })
-            ->then(function ($sequencesOfSteps) {
+            ->then(function ($sequencesOfSteps): void {
                 $this->lockCollection->drop();
                 $log = "/tmp/mongolock_{$this->iteration}.log";
                 if (file_exists($log)) {

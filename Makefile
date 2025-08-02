@@ -1,4 +1,4 @@
-.PHONY: build up down test test-long fix-cs install shell logs clean
+.PHONY: build up down test test-long fix-cs install update shell logs clean
 
 # Build the Docker image
 build:
@@ -15,6 +15,10 @@ down:
 # Install dependencies
 install:
 	docker compose run --rm php composer install
+
+# Update dependencies
+update:
+	docker compose run --rm php composer update
 
 # Run all tests except the long ones
 test: up

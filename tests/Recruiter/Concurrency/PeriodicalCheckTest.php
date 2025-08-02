@@ -27,11 +27,11 @@ class PeriodicalCheckTest extends TestCase
                 ),
             )
             // ->hook(Listener\collectFrequencies())
-            ->then(function ($startingDate, $period, $deltas) {
+            ->then(function ($startingDate, $period, $deltas): void {
                 $clock = new SettableClock($startingDate);
                 $check = PeriodicalCheck::every($period, $clock);
                 $this->counter = 0;
-                $check->onFire(function () {
+                $check->onFire(function (): void {
                     ++$this->counter;
                 });
                 $check->__invoke();

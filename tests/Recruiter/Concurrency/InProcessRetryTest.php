@@ -25,7 +25,7 @@ class InProcessRetryTest extends TestCase
 
     private function exceptionalCounterFactory(string $exceptionClass): \Closure
     {
-        return function () use ($exceptionClass) {
+        return function () use ($exceptionClass): void {
             ++$this->count;
             throw new $exceptionClass();
         };

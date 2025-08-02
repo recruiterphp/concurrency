@@ -30,7 +30,7 @@ class Timeout
     {
         $this->maximum = $microseconds;
         $this->waitingFor = $waitingFor;
-        $this->afterCheck = function () {
+        $this->afterCheck = function (): void {
         };
     }
 

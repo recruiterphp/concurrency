@@ -22,7 +22,7 @@ $operations = explode(',', $argv[2]);
 $uri = getenv('MONGODB_URI') ?: null;
 $lockCollection = new MongoDB\Client($uri)->selectCollection('concurrency-test', 'lock');
 $lock = new MongoLock($lockCollection, 'ilium_gate', $name);
-$log = function ($data) {
+$log = function ($data): void {
     fputcsv(
         STDOUT,
         array_merge(

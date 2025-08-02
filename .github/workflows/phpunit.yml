@@ -34,5 +34,8 @@ jobs:
     - name: Install dependencies
       run: make install
 
-    - name: Run test suite
+    - name: Run test suite (except long ones)
       run: make test
+
+    - name: Run test suite (only long ones)
+      run: make test-long

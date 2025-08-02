@@ -1,4 +1,4 @@
-.PHONY: build up down test test-unit fix-cs install shell logs clean
+.PHONY: build up down test test-long fix-cs install shell logs clean
 
 # Build the Docker image
 build:
@@ -16,13 +16,13 @@ down:
 install:
 	docker compose run --rm php composer install
 
-# Run all tests
+# Run all tests except the long ones
 test: up
-	docker compose exec php vendor/bin/phpunit
+	docker compose exec php vendor/bin/phpunit --exclude-group=long
 
-# Run unit tests specifically
-test-unit: up
-	docker compose exec php vendor/bin/phpunit tests/unit
+# Run long tests specifically
+test-long: up
+	docker compose exec php vendor/bin/phpunit --group=long
 
 fix-cs: up
 	docker compose exec php vendor/bin/php-cs-fixer fix -v

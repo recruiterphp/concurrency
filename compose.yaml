@@ -6,3 +6,18 @@ services:
       - .:/app
     environment:
       - COMPOSER_ALLOW_SUPERUSER=1
+      - MONGODB_URI=mongodb://mongodb:27017/concurrency
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:7
+    container_name: concurrency_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:

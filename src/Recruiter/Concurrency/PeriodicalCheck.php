@@ -7,12 +7,10 @@ use Recruiter\Clock\SystemClock;
 
 class PeriodicalCheck
 {
-    private $check;
-    private $clock;
-    private $lastCheck;
-    private $seconds;
+    private array|\Closure $check;
+    private int $lastCheck;
 
-    public static function every($seconds, Clock $clock = null)
+    public static function every(int $seconds, ?Clock $clock = null): self
     {
         if (null === $clock) {
             $clock = new SystemClock();
@@ -21,26 +19,27 @@ class PeriodicalCheck
         return new self($seconds, $clock);
     }
 
-    private function __construct($seconds, $clock)
+    private function __construct(private readonly int $seconds, private readonly Clock $clock)
     {
-        $this->seconds = $seconds;
-        $this->clock = $clock;
         $this->lastCheck = 0;
     }
 
-    public function onFire(callable $check)
+    /**
+     * @return $this
+     */
+    public function onFire(callable $check): self
     {
         $this->check = $check;
 
         return $this;
     }
 
-    public function __invoke()
+    public function __invoke(): void
     {
-        return $this->execute();
+        $this->execute();
     }
 
-    public function execute()
+    public function execute(): void
     {
         $now = $this->clock->current()->getTimestamp();
         if ($now - $this->lastCheck >= $this->seconds) {

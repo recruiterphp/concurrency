@@ -45,7 +45,7 @@ class MongoLockTest extends TestCase
         $this->givenTimeIsFixed();
         $lock = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $lock->acquire();
-        $this->assertTrue(true, 'make PHPUnit happy');
+        $this->expectNotToPerformAssertions();
     }
 
     public function testAnAlreadyAcquiredLockCannotBeAcquiredAgain()
@@ -74,7 +74,6 @@ class MongoLockTest extends TestCase
         $this->expectException(LockNotAvailableException::class);
 
         $second->refresh();
-        // $this->assertTrue(true, 'make PHPUnit happy');
     }
 
     public function testAnAlreadyAcquiredLockCanExpireSoThatItCanBeAcquiredAgain()
@@ -88,7 +87,7 @@ class MongoLockTest extends TestCase
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
         $second->acquire(3600);
-        $this->assertTrue(true, 'make PHPUnit happy');
+        $this->expectNotToPerformAssertions();
     }
 
     public function testLockForDifferentProgramsDoNotInterfereWithEachOther()
@@ -99,7 +98,7 @@ class MongoLockTest extends TestCase
 
         $second = new MongoLock($this->lockCollection, 'sll_world_domination', 'ws-a-30:23', $this->clock);
         $second->acquire();
-        $this->assertTrue(true, 'make PHPUnit happy');
+        $this->expectNotToPerformAssertions();
     }
 
     public function testLocksCanBeReleasedToMakeThemAvailableAgain()
@@ -111,7 +110,7 @@ class MongoLockTest extends TestCase
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
         $second->acquire();
-        $this->assertTrue(true, 'make PHPUnit happy');
+        $this->expectNotToPerformAssertions();
     }
 
     public function testALockCannotBeReleasedBySomeoneElseThanTheProcessAcquiringIt()
@@ -135,7 +134,7 @@ class MongoLockTest extends TestCase
 
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-30:23', $this->clock);
         $second->release($force = true);
-        $this->assertTrue(true, 'make PHPUnit happy');
+        $this->expectNotToPerformAssertions();
     }
 
     public function testALockCanBeShownEvenByOtherProcessesWorkingOnTheSameProgram()
@@ -156,7 +155,6 @@ class MongoLockTest extends TestCase
             ],
             $second->show(),
         );
-        $this->assertTrue(true, 'make PHPUnit happy');
     }
 
     public function testALockCanBeWaitedOnUntilItsDisappearance()
@@ -217,7 +215,7 @@ class MongoLockTest extends TestCase
         $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock, $this->sleep);
         $second->wait($polling = 1);
         $second->acquire();
-        $this->assertTrue(true, 'make PHPUnit happy');
+        $this->expectNotToPerformAssertions();
     }
 
     public function testAnAlreadyAcquiredLockCanBeRefreshed()

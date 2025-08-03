@@ -4,29 +4,29 @@ declare(strict_types=1);
 
 namespace Recruiter\Concurrency;
 
-interface Lock
+interface Lock extends \Stringable
 {
     /**
      * @param int $duration (in seconds)
      *
      * @throws LockNotAvailableException
      */
-    public function acquire($duration = 360): void;
+    public function acquire(int $duration = 360): void;
 
     /**
      * @param bool $force
      */
-    public function release($force = false): void;
+    public function release(bool $force = false): void;
 
     /**
      * @param int $duration (in seconds)
      *
      * @throws LockNotAvailableException
      */
-    public function refresh($duration = 3600): void;
+    public function refresh(int $duration = 3600): void;
 
     /**
-     * @return array diagnostic information
+     * @return ?array diagnostic information
      */
     public function show(): ?array;
 
@@ -34,7 +34,5 @@ interface Lock
      * @param int $polling            (in seconds)
      * @param int $maximumWaitingTime (in seconds)
      */
-    public function wait($polling = 30, $maximumWaitingTime = 3600): void;
-
-    public function __toString(): string;
+    public function wait(int $polling = 30, int $maximumWaitingTime = 3600): void;
 }

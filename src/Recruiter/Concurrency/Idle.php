@@ -8,6 +8,7 @@ class Idle
 {
     public static function sleepUntilDeath()
     {
+        /** @phpstan-ignore-next-line */
         while (true) {
             sleep(3600);
         }

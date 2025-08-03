@@ -1,7 +1,9 @@
 parameters:
-  level: 1
+  level: 2
   paths:
     - src
     - tests
   scanDirectories:
     - %currentWorkingDirectory%/vendor/giorgiosironi/eris/src/
+  ignoreErrors:
+    - '#to an undefined .*StubberProxy#'

@@ -7,7 +7,7 @@ namespace Recruiter\Concurrency;
 class Timeout
 {
     private int $elapsed = 0;
-    private $waitingFor;
+    private mixed $waitingFor;
     private \Closure|array|string|null $afterCheck = null;
     private ?int $pollingInterval = null;
 
@@ -23,7 +23,7 @@ class Timeout
         return new self($timeout * 1000 * 1000, $waitingFor);
     }
 
-    private function __construct(private readonly int $maximum, callable $waitingFor)
+    private function __construct(private readonly int $maximum, callable|string $waitingFor)
     {
         $this->waitingFor = $waitingFor;
         $this->afterCheck = function (): void {

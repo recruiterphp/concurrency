@@ -6,16 +6,15 @@ namespace Recruiter\Concurrency;
 
 class Timeout
 {
-    private $maximum;
-    private $elapsed = 0;
+    private int $elapsed = 0;
     private $waitingFor;
-    private $afterCheck;
+    private \Closure|array|string|null $afterCheck = null;
+    private ?int $pollingInterval = null;
 
     /**
-     * @param int             $timeout
-     * @param string|callable $waitingFor
+     * @return $this
      */
-    public static function inSeconds($timeout, $waitingFor = '')
+    public static function inSeconds(int $timeout, callable|string $waitingFor = ''): static
     {
         if (!is_numeric($timeout)) {
             throw new \InvalidArgumentException("The timeout must be numeric, since it's expressed in seconds. Instead it is `$timeout`.");
@@ -24,19 +23,20 @@ class Timeout
         return new self($timeout * 1000 * 1000, $waitingFor);
     }
 
-    private $pollingInterval;
-
-    private function __construct($microseconds, $waitingFor)
+    private function __construct(private readonly int $maximum, callable $waitingFor)
     {
-        $this->maximum = $microseconds;
         $this->waitingFor = $waitingFor;
         $this->afterCheck = function (): void {
         };
     }
 
-    public function checkEvery($microseconds, $afterCheck = null)
+    /**
+     * @return $this
+     */
+    public function checkEvery(int $microseconds, ?callable $afterCheck = null): static
     {
         $this->pollingInterval = $microseconds;
+        // TODO: this behaviour is weird
         if (null !== $this->afterCheck) {
             $this->afterCheck = $afterCheck;
         }
@@ -44,7 +44,7 @@ class Timeout
         return $this;
     }
 
-    public function elapse($microseconds)
+    public function elapse($microseconds): void
     {
         $this->elapsed += $microseconds;
         if ($this->elapsed > $this->maximum) {
@@ -62,7 +62,7 @@ class Timeout
      *
      * @throws TimeoutException
      */
-    public function until($callback, $microseconds = null)
+    public function until(callable $callback, ?int $microseconds = null): void
     {
         if (null === $microseconds) {
             if (null !== $this->pollingInterval) {

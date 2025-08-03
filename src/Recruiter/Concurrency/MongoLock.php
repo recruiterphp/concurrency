@@ -37,7 +37,7 @@ class MongoLock implements Lock
         return new self($collection, $programName, gethostname() . ':' . getmypid());
     }
 
-    public function acquire($duration = 3600): void
+    public function acquire(int $duration = 3600): void
     {
         $now = $this->clock->current();
 
@@ -62,7 +62,7 @@ class MongoLock implements Lock
         }
     }
 
-    public function refresh($duration = 3600): void
+    public function refresh(int $duration = 3600): void
     {
         $now = $this->clock->current();
 
@@ -97,7 +97,7 @@ class MongoLock implements Lock
         return $document;
     }
 
-    public function release($force = false): void
+    public function release(bool $force = false): void
     {
         $query = ['program' => $this->programName];
         if (!$force) {
@@ -113,7 +113,7 @@ class MongoLock implements Lock
      * @param int $polling            how frequently to check the lock presence
      * @param int $maximumWaitingTime a limit to the waiting
      */
-    public function wait($polling = 30, $maximumWaitingTime = 3600): void
+    public function wait(int $polling = 30, int $maximumWaitingTime = 3600): void
     {
         $timeLimit = $this->clock->current()->add(new \DateInterval("PT{$maximumWaitingTime}S"));
         while (true) {

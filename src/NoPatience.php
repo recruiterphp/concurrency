@@ -13,6 +13,7 @@ final readonly class NoPatience implements Patience
         $this->onFailure = $onFailure(...);
     }
 
+    #[\Override]
     public function trial(callable $function): void
     {
         if (!$function()) {

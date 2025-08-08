@@ -9,10 +9,12 @@ class NullLock implements Lock
     /**
      * @param int $duration (in seconds)
      */
+    #[\Override]
     public function acquire(int $duration = 360): void
     {
     }
 
+    #[\Override]
     public function release(bool $force = false): void
     {
     }
@@ -20,6 +22,7 @@ class NullLock implements Lock
     /**
      * @param int $duration (in seconds)
      */
+    #[\Override]
     public function refresh(int $duration = 3600): void
     {
     }
@@ -29,6 +32,7 @@ class NullLock implements Lock
      *
      * @return array<string, string>
      */
+    #[\Override]
     public function show(): array
     {
         return [
@@ -42,6 +46,7 @@ class NullLock implements Lock
      * @param int $polling            (in seconds)
      * @param int $maximumWaitingTime (in seconds)
      */
+    #[\Override]
     public function wait(int $polling = 30, int $maximumWaitingTime = 3600): void
     {
     }

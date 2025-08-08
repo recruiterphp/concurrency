@@ -4,24 +4,20 @@ declare(strict_types=1);
 
 namespace Recruiter\Concurrency;
 
-use Recruiter\Clock;
-use Recruiter\Clock\SystemClock;
+use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Clock\NativeClock;
 
 class PeriodicalCheck
 {
     private array|\Closure $check;
     private int $lastCheck;
 
-    public static function every(int $seconds, ?Clock $clock = null): self
+    public static function every(int $seconds, ?ClockInterface $clock = null): self
     {
-        if (null === $clock) {
-            $clock = new SystemClock();
-        }
-
-        return new self($seconds, $clock);
+        return new self($seconds, $clock ?? new NativeClock());
     }
 
-    private function __construct(private readonly int $seconds, private readonly Clock $clock)
+    private function __construct(private readonly int $seconds, private readonly ClockInterface $clock)
     {
         $this->lastCheck = 0;
     }
@@ -43,7 +39,7 @@ class PeriodicalCheck
 
     public function execute(): void
     {
-        $now = $this->clock->current()->getTimestamp();
+        $now = $this->clock->now()->getTimestamp();
         if ($now - $this->lastCheck >= $this->seconds) {
             call_user_func($this->check);
             $this->lastCheck = $now;

@@ -8,7 +8,7 @@ use Eris;
 use Eris\Generator;
 use Eris\Listener;
 use PHPUnit\Framework\TestCase;
-use Recruiter\Clock\SettableClock;
+use Symfony\Component\Clock\MockClock;
 
 class PeriodicalCheckTest extends TestCase
 {
@@ -27,8 +27,8 @@ class PeriodicalCheckTest extends TestCase
                 ),
             )
             // ->hook(Listener\collectFrequencies())
-            ->then(function ($startingDate, $period, $deltas): void {
-                $clock = new SettableClock($startingDate);
+            ->then(function (\DateTime $startingDate, int $period, array $deltas): void {
+                $clock = new MockClock(\DateTimeImmutable::createFromMutable($startingDate));
                 $check = PeriodicalCheck::every($period, $clock);
                 $this->counter = 0;
                 $check->onFire(function (): void {
@@ -36,7 +36,7 @@ class PeriodicalCheckTest extends TestCase
                 });
                 $check->__invoke();
                 foreach ($deltas as $delta) {
-                    $clock->advance($delta);
+                    $clock->sleep($delta);
                     $check->__invoke();
                 }
                 $totalInterval = array_sum($deltas);

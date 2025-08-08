@@ -7,29 +7,22 @@ namespace Recruiter\Concurrency;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
 use MongoDB\Driver\Exception\BulkWriteException;
-use Recruiter\Clock\SystemClock;
+use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Clock\NativeClock;
 
 class MongoLock implements Lock
 {
-    public const DUPLICATE_KEY = 11000;
+    private const int DUPLICATE_KEY = 11000;
+    private ClockInterface $clock;
 
-    private $collection;
-    private $processName;
-    private $programName;
-    private $clock;
-    private $sleep;
-
-    public function __construct(Collection $collection, $programName, $processName, $clock = null, $sleep = 'sleep')
-    {
-        $this->collection = $collection;
+    public function __construct(
+        private readonly Collection $collection,
+        private readonly string $programName,
+        private readonly string $processName,
+        ?ClockInterface $clock = null
+    ) {
         $this->collection->createIndex(['program' => 1], ['unique' => true]);
-        $this->programName = $programName;
-        $this->processName = $processName;
-        if (null === $clock) {
-            $clock = new SystemClock();
-        }
-        $this->clock = $clock;
-        $this->sleep = $sleep;
+        $this->clock = $clock ?? new NativeClock();
     }
 
     public static function forProgram($programName, Collection $collection): self
@@ -39,12 +32,11 @@ class MongoLock implements Lock
 
     public function acquire(int $duration = 3600): void
     {
-        $now = $this->clock->current();
+        $now = $this->clock->now();
 
         $this->removeExpiredLocks($now);
 
-        $expiration = clone $now;
-        $expiration->add(new \DateInterval("PT{$duration}S"));
+        $expiration = $now->add(new \DateInterval("PT{$duration}S"));
 
         try {
             $document = [
@@ -64,12 +56,11 @@ class MongoLock implements Lock
 
     public function refresh(int $duration = 3600): void
     {
-        $now = $this->clock->current();
+        $now = $this->clock->now();
 
         $this->removeExpiredLocks($now);
 
-        $expiration = clone $now;
-        $expiration->add(new \DateInterval("PT{$duration}S"));
+        $expiration = $now->add(new \DateInterval("PT{$duration}S"));
 
         $result = $this->collection->updateOne(
             ['program' => $this->programName, 'process' => $this->processName],
@@ -115,9 +106,9 @@ class MongoLock implements Lock
      */
     public function wait(int $polling = 30, int $maximumWaitingTime = 3600): void
     {
-        $timeLimit = $this->clock->current()->add(new \DateInterval("PT{$maximumWaitingTime}S"));
+        $timeLimit = $this->clock->now()->add(new \DateInterval("PT{$maximumWaitingTime}S"));
         while (true) {
-            $now = $this->clock->current();
+            $now = $this->clock->now();
             $result = $this->collection->count($query = [
                 'program' => $this->programName,
                 'expires_at' => ['$gte' => new UTCDateTime($now)],
@@ -127,7 +118,7 @@ class MongoLock implements Lock
                 if ($now > $timeLimit) {
                     throw new LockNotAvailableException("I have been waiting up until {$timeLimit->format(\DateTime::ATOM)} for the lock $this->programName ($maximumWaitingTime seconds polling every $polling seconds), but it is still not available (now is {$now->format(\DateTime::ATOM)}).");
                 }
-                call_user_func($this->sleep, $polling);
+                $this->clock->sleep($polling);
             } else {
                 break;
             }
@@ -139,7 +130,7 @@ class MongoLock implements Lock
         return var_export($this->show(), true);
     }
 
-    private function removeExpiredLocks(\DateTime $now): void
+    private function removeExpiredLocks(\DateTimeImmutable $now): void
     {
         $this->collection->deleteMany($query = [
             'program' => $this->programName,

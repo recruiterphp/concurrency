@@ -14,7 +14,7 @@ use Symfony\Component\Clock\NativeClock;
 class MongoLock implements Lock
 {
     private const int DUPLICATE_KEY = 11000;
-    private ClockInterface $clock;
+    private readonly ClockInterface $clock;
 
     public function __construct(
         private readonly Collection $collection,
@@ -119,7 +119,7 @@ class MongoLock implements Lock
                 'expires_at' => ['$gte' => new UTCDateTime($now)],
             ]);
 
-            if ($result) {
+            if ($result !== 0) {
                 if ($now > $timeLimit) {
                     throw new LockNotAvailableException("I have been waiting up until {$timeLimit->format(\DateTime::ATOM)} for the lock $this->programName ($maximumWaitingTime seconds polling every $polling seconds), but it is still not available (now is {$now->format(\DateTime::ATOM)}).");
                 }

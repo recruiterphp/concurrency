@@ -10,7 +10,7 @@ use Symfony\Component\Clock\NativeClock;
 class PeriodicalCheck
 {
     private \Closure $check;
-    private int $lastCheck;
+    private int $lastCheck = 0;
 
     public static function every(int $seconds, ?ClockInterface $clock = null): self
     {
@@ -19,7 +19,6 @@ class PeriodicalCheck
 
     private function __construct(private readonly int $seconds, private readonly ClockInterface $clock)
     {
-        $this->lastCheck = 0;
     }
 
     /**

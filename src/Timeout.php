@@ -7,7 +7,7 @@ namespace Recruiter\Concurrency;
 final class Timeout
 {
     private int $elapsed = 0;
-    private mixed $waitingFor;
+    private readonly mixed $waitingFor;
     private \Closure $afterCheck;
     private ?int $pollingInterval = null;
 
@@ -57,11 +57,7 @@ final class Timeout
     public function until(callable $callback, ?int $microseconds = null): void
     {
         if (null === $microseconds) {
-            if (null !== $this->pollingInterval) {
-                $microseconds = $this->pollingInterval;
-            } else {
-                $microseconds = 200000;
-            }
+            $microseconds = $this->pollingInterval ?? 200000;
         }
         while (true) {
             if ($callback()) {

@@ -16,7 +16,6 @@ final class ProcessRequestedStatus
      */
     private function __construct(private bool $shouldTerminate, private array $why = [])
     {
-        $this->why = $why;
     }
 
     /**

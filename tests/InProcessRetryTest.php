@@ -16,7 +16,7 @@ class InProcessRetryTest extends TestCase
     protected function setUp(): void
     {
         $this->count = 0;
-        $this->counter = function () {
+        $this->counter = function (): int {
             ++$this->count;
 
             return $this->count;
@@ -39,7 +39,7 @@ class InProcessRetryTest extends TestCase
      */
     private function limitedExceptionalCounterFactory(string $exceptionClass, int $limit): \Closure
     {
-        return function () use ($exceptionClass, &$limit) {
+        return function () use ($exceptionClass, &$limit): int {
             ++$this->count;
             if ($limit > 0) {
                 --$limit;
@@ -78,7 +78,7 @@ class InProcessRetryTest extends TestCase
         try {
             $retry->__invoke();
             $this->fail('Should let the 2nd InvalidArgumentException bubble up');
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException) {
         }
         $this->assertEquals(2, $this->count);
     }
@@ -98,7 +98,7 @@ class InProcessRetryTest extends TestCase
         try {
             $retry->__invoke();
             $this->fail('Should let the 1st Exception bubble up');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
         $this->assertEquals(1, $this->count);
     }
@@ -127,7 +127,7 @@ class InProcessRetryTest extends TestCase
         try {
             $retry->__invoke();
             $this->fail('Even multiple invocations should always fail.');
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException) {
             $this->assertEquals($totalCalls = $failures + 1, $this->count);
         }
     }

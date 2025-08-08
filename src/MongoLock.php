@@ -114,7 +114,7 @@ class MongoLock implements Lock
         $timeLimit = $this->clock->now()->add(new \DateInterval("PT{$maximumWaitingTime}S"));
         while (true) {
             $now = $this->clock->now();
-            $result = $this->collection->count($query = [
+            $result = $this->collection->countDocuments($query = [
                 'program' => $this->programName,
                 'expires_at' => ['$gte' => new UTCDateTime($now)],
             ]);

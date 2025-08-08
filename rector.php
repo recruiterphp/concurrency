@@ -16,6 +16,9 @@ return RectorConfig::configure()
         deadCode: true,
         codeQuality: true,
         typeDeclarations: true,
+        privatization: true,
+        instanceOf: true,
+        rectorPreset: true,
         phpunitCodeQuality: true,
     )
     ->withSkip([RemoveDeadZeroAndOneOperationRector::class])

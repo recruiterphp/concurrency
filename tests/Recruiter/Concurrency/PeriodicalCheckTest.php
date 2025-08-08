@@ -36,7 +36,7 @@ class PeriodicalCheckTest extends TestCase
                 });
                 $check->__invoke();
                 foreach ($deltas as $delta) {
-                    $clock->sleep($delta);
+                    $clock->modify("+{$delta} seconds");
                     $check->__invoke();
                 }
                 $totalInterval = array_sum($deltas);

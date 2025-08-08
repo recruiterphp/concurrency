@@ -2,6 +2,7 @@
     "name": "recruiterphp/concurrency",
     "description": "MongoDB-based locking system",
     "license": "MIT",
+    "type": "library",
     "authors": [
         {
             "name": "Contributors",

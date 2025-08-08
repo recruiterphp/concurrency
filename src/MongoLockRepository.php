@@ -9,15 +9,15 @@ use MongoDB\Collection;
 // TODO: converge MongoLockRepository and the HydraLockFactory
 class MongoLockRepository
 {
-    private $collection;
-
-    public function __construct(Collection $collection)
+    public function __construct(private readonly Collection $collection)
     {
-        $this->collection = $collection;
     }
 
-    // TODO: expose only not expired locks
-    public function all()
+    /**
+     * @todo expose only not expired locks
+     * @return array<int, array{program: string, process: string}>
+     */
+    public function all(): array
     {
         $result = [];
         foreach ($this->collection->find() as $document) {
@@ -34,7 +34,7 @@ class MongoLockRepository
     /**
      * @private Use only in testing environments
      */
-    public function removeAll()
+    public function removeAll(): void
     {
         $this->collection->deleteMany([]);
     }

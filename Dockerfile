@@ -10,9 +10,10 @@ RUN apt-get update && apt-get install -y \
     openjdk-17-jre-headless \
     && rm -rf /var/lib/apt/lists/*
 
-# Install MongoDB extension
+# Install MongoDB extension and pcntl
 RUN pecl install mongodb \
-    && docker-php-ext-enable mongodb
+    && docker-php-ext-enable mongodb \
+    && docker-php-ext-install pcntl
 
 # Copy Composer from official image
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

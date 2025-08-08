@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Recruiter\Concurrency\LockNotAvailableException;
 use Recruiter\Concurrency\MongoLock;
 
-require __DIR__ . '/../../../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 if (count($argv) < 3) {
     fwrite(STDERR, 'Usage: php ' . __FILE__ . ' <PROCESS_NAME> <ACTIONS>' . PHP_EOL);

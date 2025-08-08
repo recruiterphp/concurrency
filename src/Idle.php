@@ -6,7 +6,7 @@ namespace Recruiter\Concurrency;
 
 class Idle
 {
-    public static function sleepUntilDeath()
+    public static function sleepUntilDeath(): void
     {
         /** @phpstan-ignore-next-line */
         while (true) {

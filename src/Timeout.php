@@ -4,23 +4,16 @@ declare(strict_types=1);
 
 namespace Recruiter\Concurrency;
 
-class Timeout
+final class Timeout
 {
     private int $elapsed = 0;
     private mixed $waitingFor;
-    private \Closure|array|string|null $afterCheck = null;
+    private \Closure $afterCheck;
     private ?int $pollingInterval = null;
 
-    /**
-     * @return $this
-     */
-    public static function inSeconds(int $timeout, callable|string $waitingFor = ''): static
+    public static function inSeconds(int $timeout, callable|string $waitingFor = ''): self
     {
-        if (!is_numeric($timeout)) {
-            throw new \InvalidArgumentException("The timeout must be numeric, since it's expressed in seconds. Instead it is `$timeout`.");
-        }
-
-        return new self($timeout * 1000 * 1000, $waitingFor);
+        return new self($timeout * 1_000_000, $waitingFor);
     }
 
     private function __construct(private readonly int $maximum, callable|string $waitingFor)
@@ -33,18 +26,17 @@ class Timeout
     /**
      * @return $this
      */
-    public function checkEvery(int $microseconds, ?callable $afterCheck = null): static
+    public function checkEvery(int $microseconds, ?callable $afterCheck = null): self
     {
         $this->pollingInterval = $microseconds;
-        // TODO: this behaviour is weird
-        if (null !== $this->afterCheck) {
-            $this->afterCheck = $afterCheck;
+        if (null !== $afterCheck) {
+            $this->afterCheck = $afterCheck(...);
         }
 
         return $this;
     }
 
-    public function elapse($microseconds): void
+    public function elapse(int $microseconds): void
     {
         $this->elapsed += $microseconds;
         if ($this->elapsed > $this->maximum) {
@@ -75,8 +67,7 @@ class Timeout
             if ($callback()) {
                 return;
             }
-            $afterCheck = $this->afterCheck;
-            $afterCheck();
+            ($this->afterCheck)();
             $this->elapse($microseconds);
         }
     }

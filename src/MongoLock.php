@@ -7,6 +7,7 @@ namespace Recruiter\Concurrency;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
 use MongoDB\Driver\Exception\BulkWriteException;
+use MongoDB\UpdateResult;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Clock\NativeClock;
 
@@ -25,7 +26,7 @@ class MongoLock implements Lock
         $this->clock = $clock ?? new NativeClock();
     }
 
-    public static function forProgram($programName, Collection $collection): self
+    public static function forProgram(string $programName, Collection $collection): self
     {
         return new self($collection, $programName, gethostname() . ':' . getmypid());
     }
@@ -79,11 +80,15 @@ class MongoLock implements Lock
             ['typeMap' => ['root' => 'array']],
         );
 
-        if (!is_null($document)) {
-            $document['acquired_at'] = $this->convertToIso8601String($document['acquired_at']);
-            $document['expires_at'] = $this->convertToIso8601String($document['expires_at']);
-            unset($document['_id']);
+        if (null === $document) {
+            return null;
         }
+
+        assert(is_array($document));
+        assert(isset($document['acquired_at'], $document['expires_at']));
+        $document['acquired_at'] = $this->convertToIso8601String($document['acquired_at']);
+        $document['expires_at'] = $this->convertToIso8601String($document['expires_at']);
+        unset($document['_id']);
 
         return $document;
     }
@@ -147,16 +152,8 @@ class MongoLock implements Lock
         return $datetime->format(\DateTime::ATOM);
     }
 
-    private function lockRefreshed($result): bool
+    private function lockRefreshed(UpdateResult $result): bool
     {
-        $modified = $result->getModifiedCount();
-        if (!is_null($modified)) {
-            return 1 === $modified;
-        }
-
-        // result is not known (write concern is not set) so we check to see if
-        // a lock document exists, if lock document exists we are pretty sure
-        // that its update succeded
-        return !is_null($this->show());
+        return 1 === $result->getModifiedCount();
     }
 }

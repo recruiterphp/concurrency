@@ -19,7 +19,7 @@ class MongoLockTest extends TestCase
     use Eris\TestTrait;
 
     private MongoDB\Collection $lockCollection;
-    private (ClockInterface&Phake\IMock)|ProgressiveClock $clock;
+    private ClockInterface&Phake\IMock $clock;
     private int $iteration;
 
     protected function setUp(): void
@@ -34,7 +34,7 @@ class MongoLockTest extends TestCase
         $this->lockCollection->drop();
     }
 
-    public function testALockCanBeAcquired()
+    public function testALockCanBeAcquired(): void
     {
         $this->givenTimeIsFixed();
         $lock = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
@@ -42,7 +42,7 @@ class MongoLockTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testAnAlreadyAcquiredLockCannotBeAcquiredAgain()
+    public function testAnAlreadyAcquiredLockCannotBeAcquiredAgain(): void
     {
         $this->givenTimeIsFixed();
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
@@ -56,7 +56,7 @@ class MongoLockTest extends TestCase
         $second->acquire();
     }
 
-    public function testAnAlreadyAcquiredLockCannotBeAcquiredAgainEvenWithRefreshMethod()
+    public function testAnAlreadyAcquiredLockCannotBeAcquiredAgainEvenWithRefreshMethod(): void
     {
         $this->givenTimeIsFixed();
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
@@ -70,7 +70,7 @@ class MongoLockTest extends TestCase
         $second->refresh();
     }
 
-    public function testAnAlreadyAcquiredLockCanExpireSoThatItCanBeAcquiredAgain()
+    public function testAnAlreadyAcquiredLockCanExpireSoThatItCanBeAcquiredAgain(): void
     {
         \Phake::when($this->clock)->now()
             ->thenReturn(new \DateTimeImmutable('2014-01-01T10:00:00Z'))
@@ -84,7 +84,7 @@ class MongoLockTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testLockForDifferentProgramsDoNotInterfereWithEachOther()
+    public function testLockForDifferentProgramsDoNotInterfereWithEachOther(): void
     {
         $this->givenTimeIsFixed();
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
@@ -95,7 +95,7 @@ class MongoLockTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testLocksCanBeReleasedToMakeThemAvailableAgain()
+    public function testLocksCanBeReleasedToMakeThemAvailableAgain(): void
     {
         $this->givenTimeIsFixed();
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
@@ -107,7 +107,7 @@ class MongoLockTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testALockCannotBeReleasedBySomeoneElseThanTheProcessAcquiringIt()
+    public function testALockCannotBeReleasedBySomeoneElseThanTheProcessAcquiringIt(): void
     {
         $this->givenTimeIsFixed();
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
@@ -120,7 +120,7 @@ class MongoLockTest extends TestCase
         $second->release();
     }
 
-    public function testALockCanBeForcedToBeReleasedIfYouReallyKnowWhatYouReDoing()
+    public function testALockCanBeForcedToBeReleasedIfYouReallyKnowWhatYouReDoing(): void
     {
         $this->givenTimeIsFixed();
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
@@ -131,7 +131,7 @@ class MongoLockTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testALockCanBeShownEvenByOtherProcessesWorkingOnTheSameProgram()
+    public function testALockCanBeShownEvenByOtherProcessesWorkingOnTheSameProgram(): void
     {
         \Phake::when($this->clock)->now()
             ->thenReturn(new \DateTimeImmutable('2014-01-01T00:00:00Z'))
@@ -151,7 +151,7 @@ class MongoLockTest extends TestCase
         );
     }
 
-    public function testALockCanBeWaitedOnUntilItsDisappearance()
+    public function testALockCanBeWaitedOnUntilItsDisappearance(): void
     {
         $allCalls = \Phake::when($this->clock)->now()
             ->thenReturn(new \DateTimeImmutable('2014-01-01T00:00:00Z'))
@@ -168,14 +168,14 @@ class MongoLockTest extends TestCase
         \Phake::verify($this->clock, \Phake::times(2))->sleep(30);
     }
 
-    public function testALockShouldNotBeWaitedUponForever()
+    public function testALockShouldNotBeWaitedUponForever(): void
     {
-        $this->clock = new ProgressiveClock(new \DateTimeImmutable('2014-01-01T00:00:00Z'));
+        $clock = new ProgressiveClock(new \DateTimeImmutable('2014-01-01T00:00:00Z'));
 
-        $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
+        $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $clock);
         $first->acquire(3600);
 
-        $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
+        $second = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $clock);
         try {
             $second->wait($polling = 30, $maximumInterval = 60);
             $this->fail('Should fail after 60 seconds');
@@ -187,7 +187,7 @@ class MongoLockTest extends TestCase
         }
     }
 
-    public function testALockWaitedUponCanBeImmediatelyReacquired()
+    public function testALockWaitedUponCanBeImmediatelyReacquired(): void
     {
         $allCalls = \Phake::when($this->clock)->now()
             ->thenReturn(new \DateTimeImmutable('2014-01-01T00:00:00Z'))
@@ -206,7 +206,7 @@ class MongoLockTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testAnAlreadyAcquiredLockCanBeRefreshed()
+    public function testAnAlreadyAcquiredLockCanBeRefreshed(): void
     {
         \Phake::when($this->clock)->now()
             ->thenReturn(new \DateTimeImmutable('2014-01-01T00:00:00Z'))
@@ -230,7 +230,7 @@ class MongoLockTest extends TestCase
         );
     }
 
-    public function testAnExpiredLockCannotBeRefreshed()
+    public function testAnExpiredLockCannotBeRefreshed(): void
     {
         \Phake::when($this->clock)->now()
             ->thenReturn(new \DateTimeImmutable('2014-01-01T00:00:00Z'))
@@ -247,13 +247,13 @@ class MongoLockTest extends TestCase
         $second->refresh();
     }
 
-    private function givenTimeIsFixed()
+    private function givenTimeIsFixed(): void
     {
         \Phake::when($this->clock)->now()->thenReturn(new \DateTimeImmutable('2014-01-01'));
     }
 
     #[Group('long')]
-    public function testPropertyBased()
+    public function testPropertyBased(): void
     {
         $this->iteration = 0;
         $this
@@ -302,7 +302,7 @@ class MongoLockTest extends TestCase
         ;
     }
 
-    private function assertExitedCorrectly($process, $errorMessage): void
+    private function assertExitedCorrectly(Process $process, string $errorMessage): void
     {
         $this->assertEquals(
             0,

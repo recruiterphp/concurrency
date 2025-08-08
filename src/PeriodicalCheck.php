@@ -9,7 +9,7 @@ use Symfony\Component\Clock\NativeClock;
 
 class PeriodicalCheck
 {
-    private array|\Closure $check;
+    private \Closure $check;
     private int $lastCheck;
 
     public static function every(int $seconds, ?ClockInterface $clock = null): self
@@ -27,7 +27,7 @@ class PeriodicalCheck
      */
     public function onFire(callable $check): self
     {
-        $this->check = $check;
+        $this->check = $check(...);
 
         return $this;
     }

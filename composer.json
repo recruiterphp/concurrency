@@ -11,6 +11,8 @@
     "require": {
         "php": "^8.4",
         "ext-mongodb": "*",
+        "ext-pcntl": "*",
+        "ext-posix": "*",
         "mongodb/mongodb": "^2.1",
         "recruiterphp/clock": "^5.0"
     },
@@ -19,10 +21,10 @@
         "friendsofphp/php-cs-fixer": "^3.85",
         "giorgiosironi/eris": "^1.0",
         "phake/phake": "^4.6",
-        "phpunit/phpunit": "^12.3",
-        "symfony/process": "^7.3",
         "phpstan/phpstan": "^2.1",
-        "rector/rector": "^2.1"
+        "phpunit/phpunit": "^12.3",
+        "rector/rector": "^2.1",
+        "symfony/process": "^7.3"
     },
     "replace": {
         "easywelfare/onebip-concurrency": "self.version",

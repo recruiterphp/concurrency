@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Recruiter\Concurrency;
 
-class NoPatience implements Patience
+final readonly class NoPatience implements Patience
 {
-    private $onFailure;
+    private \Closure $onFailure;
 
-    public function __construct($onFailure)
+    public function __construct(callable $onFailure)
     {
-        $this->onFailure = $onFailure;
+        $this->onFailure = $onFailure(...);
     }
 
-    public function trial($function)
+    public function trial(callable $function): void
     {
         if (!$function()) {
             $onFailure = $this->onFailure;

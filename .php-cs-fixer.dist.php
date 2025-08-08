@@ -21,5 +21,6 @@ return new PhpCsFixer\Config()
         PhpCsFixer\Finder::create()
             ->in(__DIR__ . '/src')
             ->in(__DIR__ . '/tests')
+            ->append([__DIR__.'/rector.php'])
     )
 ;

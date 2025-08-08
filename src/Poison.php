@@ -23,10 +23,10 @@ class Poison
     public function drinkAfter(int $timeLimit): self
     {
         $pid = pcntl_fork();
-        if (!($pid >= 0)) {
+        if ($pid < 0) {
             throw new \RuntimeException("Cannot fork {$this->programName} to perform timeout checks. The script will not run.");
         }
-        if ($pid) {
+        if ($pid !== 0) {
             // we are in father
             $child = $pid;
             $this->sleepUntilThereIsSomethingInteresting($timeLimit, $child);
@@ -43,7 +43,7 @@ class Poison
 
     private function sleepUntilThereIsSomethingInteresting(int $timeLimit, int $child): void
     {
-        pcntl_signal(SIGALRM, [$this, 'alarm'], true);
+        pcntl_signal(SIGALRM, $this->alarm(...), true);
         pcntl_alarm($timeLimit);
         pcntl_waitpid($child, $status);
         // pcntl_signal_dispatch();

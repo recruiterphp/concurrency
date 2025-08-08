@@ -13,7 +13,7 @@ if (count($argv) < 3) {
     exit(-1);
 }
 $name = "p{$argv[1]}";
-if (!$argv[2]) {
+if ($argv[2] === '') {
     fwrite(STDERR, 'ACTIONS must be not empty' . PHP_EOL);
     exit(-2);
 }
@@ -45,7 +45,7 @@ foreach ($operations as $operation) {
     try {
         $lock->$operation();
         $type = 'ok';
-    } catch (LockNotAvailableException $e) {
+    } catch (LockNotAvailableException) {
         $type = 'fail';
     }
     $log([

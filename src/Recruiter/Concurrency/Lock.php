@@ -13,9 +13,6 @@ interface Lock extends \Stringable
      */
     public function acquire(int $duration = 360): void;
 
-    /**
-     * @param bool $force
-     */
     public function release(bool $force = false): void;
 
     /**

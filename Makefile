@@ -1,4 +1,4 @@
-.PHONY: build up down test test-long phpstan rector fix-cs install update shell logs clean
+.PHONY: build up down test test-long phpstan psalm rector fix-cs install update shell logs clean
 
 # Build the Docker image
 build:
@@ -30,6 +30,9 @@ test-long: up
 
 phpstan: up
 	docker compose exec php vendor/bin/phpstan --memory-limit=2G
+
+psalm: up
+	docker compose exec php vendor/bin/psalm --memory-limit=2G
 
 rector: up
 	docker compose exec php vendor/bin/rector

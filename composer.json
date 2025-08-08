@@ -24,7 +24,8 @@
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^12.3",
         "rector/rector": "^2.1",
-        "symfony/process": "^7.3"
+        "symfony/process": "^7.3",
+        "vimeo/psalm": "^6.13"
     },
     "replace": {
         "easywelfare/onebip-concurrency": "self.version",

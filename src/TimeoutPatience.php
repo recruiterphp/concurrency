@@ -10,6 +10,7 @@ readonly class TimeoutPatience implements Patience
     {
     }
 
+    #[\Override]
     public function trial(callable $function): void
     {
         $this->timeout->until($function);

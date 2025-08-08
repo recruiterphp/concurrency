@@ -57,7 +57,7 @@ class InProcessRetryTest extends TestCase
     {
         $retry = InProcessRetry::of($this->counter, 'InvalidArgumentException');
         $retry->__invoke();
-        $this->assertEquals(1, $this->count);
+        $this->assertSame(1, $this->count);
     }
 
     /**
@@ -80,7 +80,7 @@ class InProcessRetryTest extends TestCase
             $this->fail('Should let the 2nd InvalidArgumentException bubble up');
         } catch (\InvalidArgumentException) {
         }
-        $this->assertEquals(2, $this->count);
+        $this->assertSame(2, $this->count);
     }
 
     /**
@@ -100,7 +100,7 @@ class InProcessRetryTest extends TestCase
             $this->fail('Should let the 1st Exception bubble up');
         } catch (\Exception) {
         }
-        $this->assertEquals(1, $this->count);
+        $this->assertSame(1, $this->count);
     }
 
     /**
@@ -128,7 +128,7 @@ class InProcessRetryTest extends TestCase
             $retry->__invoke();
             $this->fail('Even multiple invocations should always fail.');
         } catch (\InvalidArgumentException) {
-            $this->assertEquals($totalCalls = $failures + 1, $this->count);
+            $this->assertSame($totalCalls = $failures + 1, $this->count);
         }
     }
 }

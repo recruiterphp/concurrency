@@ -15,6 +15,7 @@ class MongoLockRepository
 
     /**
      * @todo expose only not expired locks
+     *
      * @return array<int, array{program: string, process: string}>
      */
     public function all(): array

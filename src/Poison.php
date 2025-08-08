@@ -26,7 +26,7 @@ class Poison
         if ($pid < 0) {
             throw new \RuntimeException("Cannot fork {$this->programName} to perform timeout checks. The script will not run.");
         }
-        if ($pid !== 0) {
+        if (0 !== $pid) {
             // we are in father
             $child = $pid;
             $this->sleepUntilThereIsSomethingInteresting($timeLimit, $child);

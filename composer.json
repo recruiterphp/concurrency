@@ -29,8 +29,13 @@
         "onebip/onebip-concurrency": "self.version"
     },
     "autoload": {
-        "psr-0": {
-            "Recruiter\\": "src/"
+        "psr-4": {
+            "Recruiter\\Concurrency\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Recruiter\\Concurrency\\": "tests/"
         }
     },
     "config": {

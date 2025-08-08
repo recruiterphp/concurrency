@@ -23,6 +23,9 @@ class InProcessRetryTest extends TestCase
         };
     }
 
+    /**
+     * @param class-string<\Exception> $exceptionClass
+     */
     private function exceptionalCounterFactory(string $exceptionClass): \Closure
     {
         return function () use ($exceptionClass): void {
@@ -31,6 +34,9 @@ class InProcessRetryTest extends TestCase
         };
     }
 
+    /**
+     * @param class-string<\Exception> $exceptionClass
+     */
     private function limitedExceptionalCounterFactory(string $exceptionClass, int $limit): \Closure
     {
         return function () use ($exceptionClass, &$limit) {

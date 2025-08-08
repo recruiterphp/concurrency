@@ -6,24 +6,21 @@ namespace Recruiter\Concurrency;
 
 class Poison
 {
-    private $programName;
-
-    public static function forProgram($programName)
+    public static function forProgram(string $programName): self
     {
         return new self($programName);
     }
 
-    private function __construct($programName)
+    private function __construct(private readonly string $programName)
     {
-        $this->programName = $programName;
     }
 
     /**
      * @param int $timeLimit in seconds
      *
-     * @return self
+     * @return $this
      */
-    public function drinkAfter($timeLimit)
+    public function drinkAfter(int $timeLimit): self
     {
         $pid = pcntl_fork();
         if (!($pid >= 0)) {
@@ -44,7 +41,7 @@ class Poison
         }
     }
 
-    private function sleepUntilThereIsSomethingInteresting($timeLimit, $child)
+    private function sleepUntilThereIsSomethingInteresting(int $timeLimit, int $child): void
     {
         pcntl_signal(SIGALRM, [$this, 'alarm'], true);
         pcntl_alarm($timeLimit);
@@ -52,18 +49,18 @@ class Poison
         // pcntl_signal_dispatch();
     }
 
-    public function alarm()
+    public function alarm(): void
     {
         // error_log("Alarm has triggered");
     }
 
-    private function isAlive($pid)
+    private function isAlive(int $pid): bool
     {
         return posix_kill($pid, 0);
     }
 
-    private function kill($pid)
+    private function kill(int $pid): void
     {
-        posix_kill($pid, 9);
+        posix_kill($pid, SIGKILL);
     }
 }

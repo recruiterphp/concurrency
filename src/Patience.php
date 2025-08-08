@@ -9,7 +9,7 @@ interface Patience
     /**
      * Insists calling $function for a while until it returns true.
      *
-     * @param callable $function returns a boolean
+     * @param callable(): bool $function returns a boolean
      */
-    public function trial($function);
+    public function trial(callable $function): void;
 }

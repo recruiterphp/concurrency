@@ -4,23 +4,25 @@ declare(strict_types=1);
 
 namespace Recruiter\Concurrency;
 
-class ProcessRequestedStatus
+final class ProcessRequestedStatus
 {
-    private $shouldTerminate;
-    private $why;
-
-    public static function active()
+    public static function active(): self
     {
         return new self(false);
     }
 
-    private function __construct($shouldTerminate, array $why = [])
+    /**
+     * @param array<int,string> $why
+     */
+    private function __construct(private bool $shouldTerminate, private array $why = [])
     {
-        $this->shouldTerminate = $shouldTerminate;
         $this->why = $why;
     }
 
-    public function stop($why)
+    /**
+     * @return $this
+     */
+    public function stop(string $why): self
     {
         $this->shouldTerminate = true;
         $this->why[] = $why;
@@ -28,12 +30,15 @@ class ProcessRequestedStatus
         return $this;
     }
 
-    public function shouldTerminate()
+    public function shouldTerminate(): bool
     {
         return $this->shouldTerminate;
     }
 
-    public function why()
+    /**
+     * @return array<int,string>
+     */
+    public function why(): array
     {
         return $this->why;
     }

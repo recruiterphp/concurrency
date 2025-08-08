@@ -1,5 +1,5 @@
 parameters:
-  level: 4
+  level: 9
   paths:
     - src
     - tests
@@ -7,3 +7,4 @@ parameters:
     - %currentWorkingDirectory%/vendor/giorgiosironi/eris/src/
   ignoreErrors:
     - '#to an undefined .*StubberProxy#'
+    - '#to an undefined .*VerifierProxy#'

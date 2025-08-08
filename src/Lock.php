@@ -23,7 +23,9 @@ interface Lock extends \Stringable
     public function refresh(int $duration = 3600): void;
 
     /**
-     * @return ?array diagnostic information
+     * Returns the lock status.
+     *
+     * @return ?array<string, string>
      */
     public function show(): ?array;
 

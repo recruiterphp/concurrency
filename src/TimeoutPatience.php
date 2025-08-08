@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace Recruiter\Concurrency;
 
-class TimeoutPatience implements Patience
+readonly class TimeoutPatience implements Patience
 {
-    private $timeout;
-
-    public function __construct(Timeout $timeout)
+    public function __construct(private Timeout $timeout)
     {
-        $this->timeout = $timeout;
     }
 
-    public function trial($function)
+    public function trial(callable $function): void
     {
         $this->timeout->until($function);
     }

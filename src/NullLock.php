@@ -24,6 +24,11 @@ class NullLock implements Lock
     {
     }
 
+    /**
+     * Returns the lock status.
+     *
+     * @return array<string, string>
+     */
     public function show(): array
     {
         return [

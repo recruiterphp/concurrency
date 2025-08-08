@@ -4,31 +4,47 @@ declare(strict_types=1);
 
 namespace Recruiter\Concurrency;
 
-class InProcessRetry
+/**
+ * @template T
+ */
+final class InProcessRetry
 {
-    private $what;
-    private $exceptionClass;
-    private $retries = 1;
+    private int $retries = 1;
 
-    public static function of($what, $exceptionClass)
+    /**
+     * Creates a new InProcessRetry instance.
+     *
+     * @param \Closure(): T $what The closure to be retried.
+     * @param class-string<\Exception> $exceptionClass
+     * @return self<T>
+     */
+    public static function of(\Closure $what, string $exceptionClass): self
     {
         return new self($what, $exceptionClass);
     }
 
-    private function __construct($what, $exceptionClass)
+    /**
+     * @param \Closure(): T $what The closure to be retried.
+     * @param class-string $exceptionClass
+     */
+    private function __construct(private readonly \Closure $what, private readonly string $exceptionClass)
     {
-        $this->what = $what;
-        $this->exceptionClass = $exceptionClass;
     }
 
-    public function forTimes($retries)
+    /**
+     * @return $this
+     */
+    public function forTimes(int $retries): self
     {
         $this->retries = $retries;
 
         return $this;
     }
 
-    public function __invoke()
+    /**
+     * @throws \Exception
+     */
+    public function __invoke(): mixed
     {
         $possibleRetries = $this->retries;
         for ($i = 0; $i <= $possibleRetries; ++$i) {

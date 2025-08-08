@@ -16,7 +16,7 @@ class PeriodicalCheckTest extends TestCase
 
     private int $counter;
 
-    public function testDoesNotPerformTheCheckTooManyTimes()
+    public function testDoesNotPerformTheCheckTooManyTimes(): void
     {
         $this
             ->forAll(
@@ -35,6 +35,8 @@ class PeriodicalCheckTest extends TestCase
                     ++$this->counter;
                 });
                 $check->__invoke();
+
+                /** @var array<int> $deltas */
                 foreach ($deltas as $delta) {
                     $clock->modify("+{$delta} seconds");
                     $check->__invoke();

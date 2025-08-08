@@ -20,7 +20,7 @@ class MongoLock implements Lock
         private readonly Collection $collection,
         private readonly string $programName,
         private readonly string $processName,
-        ?ClockInterface $clock = null
+        ?ClockInterface $clock = null,
     ) {
         $this->collection->createIndex(['program' => 1], ['unique' => true]);
         $this->clock = $clock ?? new NativeClock();
@@ -124,7 +124,7 @@ class MongoLock implements Lock
                 'expires_at' => ['$gte' => new UTCDateTime($now)],
             ]);
 
-            if ($result !== 0) {
+            if (0 !== $result) {
                 if ($now > $timeLimit) {
                     throw new LockNotAvailableException("I have been waiting up until {$timeLimit->format(\DateTime::ATOM)} for the lock $this->programName ($maximumWaitingTime seconds polling every $polling seconds), but it is still not available (now is {$now->format(\DateTime::ATOM)}).");
                 }

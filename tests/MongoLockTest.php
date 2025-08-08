@@ -158,7 +158,8 @@ class MongoLockTest extends TestCase
             ->thenReturn(new \DateTimeImmutable('2014-01-01T00:00:00Z'))
             ->thenReturn(new \DateTimeImmutable('2014-01-01T00:00:00Z'))
             ->thenReturn(new \DateTimeImmutable('2014-01-01T00:00:30Z'))
-            ->thenReturn(new \DateTimeImmutable('2014-01-01T00:01:00Z'));
+            ->thenReturn(new \DateTimeImmutable('2014-01-01T00:01:00Z'))
+        ;
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire(45);
 
@@ -194,7 +195,8 @@ class MongoLockTest extends TestCase
             ->thenReturn(new \DateTimeImmutable('2014-01-01T00:00:30Z'))
             ->thenReturn(new \DateTimeImmutable('2014-01-01T00:00:30Z'))
             ->thenReturn(new \DateTimeImmutable('2014-01-01T00:00:31Z'))
-            ->thenReturn(new \DateTimeImmutable('2014-01-01T00:00:31Z'));
+            ->thenReturn(new \DateTimeImmutable('2014-01-01T00:00:31Z'))
+        ;
         $first = new MongoLock($this->lockCollection, 'windows_defrag', 'ws-a-25:42', $this->clock);
         $first->acquire(30);
 

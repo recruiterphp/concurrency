@@ -14,8 +14,9 @@ final class InProcessRetry
     /**
      * Creates a new InProcessRetry instance.
      *
-     * @param \Closure(): T $what The closure to be retried.
+     * @param \Closure(): T            $what           the closure to be retried
      * @param class-string<\Exception> $exceptionClass
+     *
      * @return self<T>
      */
     public static function of(\Closure $what, string $exceptionClass): self
@@ -24,8 +25,8 @@ final class InProcessRetry
     }
 
     /**
-     * @param \Closure(): T $what The closure to be retried.
-     * @param class-string $exceptionClass
+     * @param \Closure(): T $what           the closure to be retried
+     * @param class-string  $exceptionClass
      */
     private function __construct(private readonly \Closure $what, private readonly string $exceptionClass)
     {

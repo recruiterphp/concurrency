@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(InProcessRetry::class)]
-class InProcessRetryTest extends TestCase
+final class InProcessRetryTest extends TestCase
 {
     private int $count;
     private \Closure $counter;
@@ -28,7 +28,7 @@ class InProcessRetryTest extends TestCase
      */
     private function exceptionalCounterFactory(string $exceptionClass): \Closure
     {
-        return function () use ($exceptionClass): void {
+        return function () use ($exceptionClass): never {
             ++$this->count;
             throw new $exceptionClass();
         };

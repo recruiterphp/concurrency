@@ -14,7 +14,7 @@ use Recruiter\Clock\ProgressiveClock;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Process\Process;
 
-class MongoLockTest extends TestCase
+final class MongoLockTest extends TestCase
 {
     use Eris\TestTrait;
 

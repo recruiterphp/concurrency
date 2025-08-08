@@ -10,7 +10,7 @@ use Eris\Listener;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
 
-class PeriodicalCheckTest extends TestCase
+final class PeriodicalCheckTest extends TestCase
 {
     use Eris\TestTrait;
 

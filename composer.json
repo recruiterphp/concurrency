@@ -12,7 +12,7 @@
         "php": "^8.4",
         "ext-mongodb": "*",
         "mongodb/mongodb": "^2.1",
-        "recruiterphp/clock": "^4.1"
+        "recruiterphp/clock": "^5.0"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.47",

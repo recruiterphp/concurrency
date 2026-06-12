@@ -1,6 +1,9 @@
 services:
   php:
-    build: .
+    build:
+      context: .
+      args:
+        PHP_VERSION: ${PHP_VERSION:-8.4}
     working_dir: /app
     volumes:
       - .:/app

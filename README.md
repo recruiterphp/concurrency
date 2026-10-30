@@ -14,7 +14,7 @@ A MongoDB-based locking system for PHP applications that provides distributed lo
 
 - PHP 8.4+
 - MongoDB extension
-- MongoDB server
+- MongoDB server 9.0+
 
 ## Installation
 

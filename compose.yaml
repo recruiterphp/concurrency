@@ -14,7 +14,7 @@ services:
       - mongodb
 
   mongodb:
-    image: mongo:8
+    image: mongo:9.0
     container_name: concurrency_mongodb
     restart: unless-stopped
     ports:

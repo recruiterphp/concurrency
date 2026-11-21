@@ -18,7 +18,7 @@
         "recruiterphp/clock": "^5.0"
     },
     "require-dev": {
-        "ergebnis/composer-normalize": "^2.47",
+        "ergebnis/composer-normalize": "^2.56",
         "friendsofphp/php-cs-fixer": "^3.85",
         "giorgiosironi/eris": "^1.0",
         "phake/phake": "^4.6",
